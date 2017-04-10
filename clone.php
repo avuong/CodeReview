@@ -7,29 +7,49 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,50" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/live/3.1/firebase.js"></script>
 
+
   </head>
   <body>
     <?php
+
+      $cloneExec = "/home/ec2-user/pdrumm/test/wrapper.sh";
+      $cloneDir = "/tmp/git_clone";
+      $dirName = uniqid(null, true);
+
+      $SUCCESS = 0;
+      $ERROR   = 1;
+      $AUTHN   = 2;
+
       $repoErr = "";
       $repo = "";
 
       if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+        if (isset($_POST['form_repo_name'])) {
         if (empty($_POST["repo"])) {
           $repoErr = "Repository is required";
         } else {
           $repo = cleanInput($_POST["repo"]);
-          if (isValidRepo($repo)) {
-              echo $repo;
-              $cloneExec = "/home/ec2-user/pdrumm/test/nocheckout.sh";
-              $cloneDir = "/tmp/git_clone";
-              $dirName = uniqid(null, true);
-              $cmd = join(" ", array($cloneExec, $repo, $cloneDir, $dirName));
-              $output = shell_exec($cmd);
-              echo "<pre>$output</pre>";
-          } else {
+          if (!isValidRepo($repo)) {
               $repoErr = "Not a valid repository";
           }
         }
+        }
+
+        if (isset($_POST['form_repo_pwd'])) {
+            echo $_POST['repo_name'];
+            echo $_POST['pwd'];
+            $cmd = join(" ", array($cloneExec, $_POST['repo_name'], $cloneDir, $dirName, $_POST['pwd']));
+            $exitCode = shell_exec($cmd);
+            echo "<pre>$exitCode</pre>";
+              
+            if ($exitCode == $AUTHN) {
+                echo "<script type='text/javascript'>",
+                    "document.getElementById('clone_pwd_modal').style.display='block'",
+                    "</script>";
+            }
+        }
+
       }
 
       function cleanInput($data) {
@@ -51,12 +71,106 @@
     ?>
     <h1> Clone your repository </h1>
   
+    <!-- Repo input form -->
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
         Name: <input type="text" name="repo" value="<?php echo $repo;?>">
         <span class="error">* <?php echo $repoErr;?></span>
         <br></br>
-        <input type="submit" name="submit" value="git clone"/>
+        <input type="submit" name="form_repo_name" value="git clone"/>
     </form>
+
+    <!-- authn modal -->
+    <div id="clone_pwd_modal" class="modal">
+        <span onclick="document.getElementById('clone_pwd_modal').style.display='none'" class="close" title="Close Modal">&times;</span>
+        <!-- Modal Content -->
+        <form method="post" class="modal-content animate" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+            <label><b>Password</b></label>
+            <br></br>
+            <input readonly value="<?php echo $repo; ?>" name="repo_name">
+            <br></br>
+            <input type="password" placeholder="Enter Password" name="pwd" required>
+            <br></br>
+            <button type="submit" name="form_repo_pwd">git clone</button>
+        </form>
+    </div>
+
+    <?php
+        if (isset($_POST['form_repo_name'])) {
+          if (isValidRepo($repo)) {
+            echo $repo;
+            $cmd = join(" ", array($cloneExec, $repo, $cloneDir, $dirName));
+            $exitCode = shell_exec($cmd);
+            echo "<pre>$exitCode</pre>";
+              
+            if ($exitCode == $AUTHN) {
+                echo "<script type='text/javascript'>",
+                    "document.getElementById('clone_pwd_modal').style.display='block'",
+                    "</script>";
+            }
+          }
+        }
+    ?>
+
+
+    <style>
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    padding-top: 60px;
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 5px auto; /* 15% from the top and centered */
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.close {
+    /* Position it in the top right corner outside of the modal */
+    position: absolute;
+    right: 25px;
+    top: 0; 
+    color: #000;
+    font-size: 35px;
+    font-weight: bold;
+}
+
+/* Close button on hover */
+.close:hover,
+.close:focus {
+    color: red;
+    cursor: pointer;
+}
+
+/* Add Zoom Animation */
+.animate {
+    -webkit-animation: animatezoom 0.6s;
+    animation: animatezoom 0.6s
+}
+
+@-webkit-keyframes animatezoom {
+    from {-webkit-transform: scale(0)} 
+    to {-webkit-transform: scale(1)}
+}
+
+@keyframes animatezoom {
+    from {transform: scale(0)} 
+    to {transform: scale(1)}
+}
+    </style>
+
 
   </body>
   
