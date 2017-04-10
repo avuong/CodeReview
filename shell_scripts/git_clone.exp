@@ -1,0 +1,27 @@
+#!/usr/bin/expect
+set timeout 5
+
+set remote [lindex $argv 0]
+set local [lindex $argv 1]
+set pwd [lindex $argv 2]
+
+spawn git clone --no-checkout $remote $local
+expect {
+	"*ermission denied*"
+		{
+			exit 3
+			#send \003
+			#exp_continue
+		}
+	"*assword:"
+        {
+            if { [string length $pwd] == 0 } {
+                exit 2
+            }
+            send "$pwd\r\n"
+			exp_continue
+        }
+}
+wait
+exit 0
+#close $spawn_id

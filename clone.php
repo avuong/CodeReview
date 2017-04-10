@@ -5,20 +5,24 @@
     <meta charset="utf-8">
     <title> Group 2 Code Review Project</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,50" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/live/3.1/firebase.js"></script>
-
 
   </head>
   <body>
     <?php
+      session_start();
 
-      $cloneExec = "/home/ec2-user/pdrumm/test/wrapper.sh";
+	  $hostname = "52.34.131.50";
+	  $port = "8172";
+	  $onSuccessPhp = "select_commits.php";
+	  
+      $cloneExec = "/home/ec2-user/apache/htdocs/shell_scripts/clone.sh";
       $cloneDir = "/tmp/git_clone";
       $dirName = uniqid(null, true);
 
-      $SUCCESS = 0;
-      $ERROR   = 1;
-      $AUTHN   = 2;
+      $SUCCESS     = "0";
+      $ERROR       = "1";
+      $AUTHN       = "2";
+	  $PERM_DENIED = "3";
 
       $repoErr = "";
       $repo = "";
@@ -37,17 +41,26 @@
         }
 
         if (isset($_POST['form_repo_pwd'])) {
-            echo $_POST['repo_name'];
-            echo $_POST['pwd'];
             $cmd = join(" ", array($cloneExec, $_POST['repo_name'], $cloneDir, $dirName, $_POST['pwd']));
             $exitCode = shell_exec($cmd);
+			$exitCode = trim($exitCode);
             echo "<pre>$exitCode</pre>";
-              
-            if ($exitCode == $AUTHN) {
+            
+            if ($exitCode == $PERM_DENIED) {
                 echo "<script type='text/javascript'>",
-                    "document.getElementById('clone_pwd_modal').style.display='block'",
+                    "alert('Authentication failed.')",
                     "</script>";
-            }
+            } else if ($exitCode == $SUCCESS) {
+				if (substr($cloneDir, -1) != "/")
+					$cloneDir .= "/";
+				$_SESSION['review_id'] = $dirName;
+                header("Location: http://".$hostname.":".$port."/".$onSuccessPhp);
+				exit();
+            } else {
+				echo "<script type='text/javascript'>",
+                    "alert('Error')",
+                    "</script>";
+			}
         }
 
       }
@@ -100,13 +113,24 @@
             echo $repo;
             $cmd = join(" ", array($cloneExec, $repo, $cloneDir, $dirName));
             $exitCode = shell_exec($cmd);
-            echo "<pre>$exitCode</pre>";
+			$exitCode = trim($exitCode);
+            echo "<pre>~~~\n$exitCode\n~~~</pre>";
               
             if ($exitCode == $AUTHN) {
                 echo "<script type='text/javascript'>",
                     "document.getElementById('clone_pwd_modal').style.display='block'",
                     "</script>";
-            }
+            } else if ($exitCode == $SUCCESS) {
+				if (substr($cloneDir, -1) != "/")
+					$cloneDir .= "/";
+				$_SESSION['review_id'] = $dirName;
+                header("Location: http://".$hostname.":".$port."/".$onSuccessPhp);
+				exit();
+			} else {
+				echo "<script type='text/javascript'>",
+                    "alert('Error')",
+                    "</script>";
+			}
           }
         }
     ?>
