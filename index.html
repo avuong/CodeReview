@@ -12,21 +12,34 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
 	
   </head>
-  <body>
+  <body class="valign-wrapper">
 
-    <h1> ADB Code Review (Group 2) </h1>
-      <form action="./add_user.php" method="POST">
-        <label>User Name </label>
+	<div class="valign container">
+	  <h3> ADB Code Review <i>(Group 2)</i> </h3>
+      
+	  <form action="./add_user.php" method="POST">
+        <label>User Name</label>
         <input name="username" type="text" size="25" />
 
-        <label>Password: </label>
+        <label>Password:</label>
         <input name="password" type="password" size="25" />
 
-        <input name="mySubmit" type="submit" value="Sign Up!" />
+        <input name="mySubmit" type="submit" value="Sign Up!" class="waves-effect waves-light btn" />
       </form>
 
     </div>
 
   </body>
+
+  <style>
+  html {
+	width: 100%;
+	height: 85%;
+  }
+  body {
+	width: 100%;
+	height: 100%;
+  }
+  </style>
   
 </html>

@@ -13,7 +13,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
 	
   </head>
-  <body>
+  <body class="valign-wrapper">
+  
     <?php
       session_start();
 
@@ -37,11 +38,11 @@
 
         if (isset($_POST['form_repo_name'])) {
         if (empty($_POST["repo"])) {
-          $repoErr = "Repository is required";
+          $repoErr = "* Repository is required";
         } else {
           $repo = cleanInput($_POST["repo"]);
           if (!isValidRepo($repo)) {
-              $repoErr = "Not a valid repository";
+              $repoErr = "* Not a valid repository";
           }
         }
         }
@@ -88,28 +89,34 @@
       }
  
     ?>
-    <h3> Create Review </h3>
   
     <!-- Repo input form -->
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-        Git Repository: <input type="text" name="repo" value="<?php echo $repo;?>">
-        <span class="error">* <?php echo $repoErr;?></span>
-        <br></br>
-        <input type="submit" name="form_repo_name" value="git clone" class="waves-effect waves-light btn"/>
-    </form>
+	<div class="valign container">
+      <h3> Create a Review </h3>
+      <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+          <label><b>Git Repository:</b></label>
+		  <input type="text" name="repo" value="<?php echo $repo;?>">
+          <span class="error" style="color: red;"><?php echo $repoErr;?></span>
+          <br></br>
+          <input type="submit" name="form_repo_name" value="Create" class="waves-effect waves-light btn"/>
+      </form>
+	</div>
 
     <!-- authn modal -->
     <div id="clone_pwd_modal" class="modal">
+		<div class="container">
         <span onclick="document.getElementById('clone_pwd_modal').style.display='none'" class="close" title="Close Modal">&times;</span>
         <!-- Modal Content -->
         <form method="post" class="modal-content animate" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-            <h5>Password Required</h5>
+            <h5 class="center-align">Password Required</h5>
+			
 			<label><b>Git Repository</b></label>
             <input readonly value="<?php echo $repo; ?>" name="repo_name">
             <label><b>Password</b></label>
             <input type="password" name="pwd" required>
-            <button type="submit" name="form_repo_pwd" class="waves-effect waves-light btn">git clone</button>
+            <button type="submit" name="form_repo_pwd" class="waves-effect waves-light btn">Submit</button>
         </form>
+		</div>
     </div>
 
     <?php
@@ -118,7 +125,7 @@
             $cmd = join(" ", array($cloneExec, $repo, $cloneDir, $dirName, $_SESSION['user_id']));
             $exitCode = shell_exec($cmd);
 			$exitCode = trim($exitCode);
-            echo "<pre>~~~\n$exitCode\n~~~</pre>";
+            #echo "<pre>~~~\n$exitCode\n~~~</pre>";
               
             if ($exitCode == $AUTHN) {
                 echo "<script type='text/javascript'>",
@@ -141,6 +148,16 @@
 
 
     <style>
+	
+	html {
+		width: 100%;
+		height: 85%;
+	}
+	body {
+		width: 100%;
+		height: 100%;
+	}
+	
 /* The Modal (background) */
 .modal {
     display: none; /* Hidden by default */
