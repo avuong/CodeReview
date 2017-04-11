@@ -1,9 +1,10 @@
 #! /bin/bash
-# usage: clone.sh <remote repo> <local dir> <repo name> [password]
+# usage: clone.sh <remote repo> <local dir> <repo name> <sql_userid> [password]
 remote_repo=$1
 local_path=$2
 repo_name=$3
-password=$4
+sql_userid=$4
+password=$5
 
 # echo exit code before exiting
 function quit {
@@ -12,7 +13,7 @@ function quit {
 }
 
 # Check for valid usage
-if [ $# -ne 3 ] && [ $# -ne 4 ]; then
+if [ $# -ne 4 ] && [ $# -ne 5 ]; then
     quit 1
 fi
 
@@ -30,5 +31,5 @@ if [ $ret -ne 0 ]; then
 fi
 
 # Load commit metadata into SQLPlus
-/home/ec2-user/apache/htdocs/shell_scripts/sql_load_commits.sh $local_repo $repo_name > /dev/null
+/home/ec2-user/apache/htdocs/shell_scripts/sql_load_commits.sh $local_repo $repo_name $sql_userid > /dev/null
 quit $?

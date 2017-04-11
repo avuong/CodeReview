@@ -6,6 +6,12 @@
     <title> Group 2 Code Review Project</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,50" rel="stylesheet">
 
+	<!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
+	
   </head>
   <body>
     <?php
@@ -41,10 +47,10 @@
         }
 
         if (isset($_POST['form_repo_pwd'])) {
-            $cmd = join(" ", array($cloneExec, $_POST['repo_name'], $cloneDir, $dirName, $_POST['pwd']));
+            $cmd = join(" ", array($cloneExec, $_POST['repo_name'], $cloneDir, $dirName, $_SESSION['user_id'], $_POST['pwd']));
             $exitCode = shell_exec($cmd);
 			$exitCode = trim($exitCode);
-            echo "<pre>$exitCode</pre>";
+            #echo "<pre>$exitCode</pre>";
             
             if ($exitCode == $PERM_DENIED) {
                 echo "<script type='text/javascript'>",
@@ -82,14 +88,14 @@
       }
  
     ?>
-    <h1> Clone your repository </h1>
+    <h3> Create Review </h3>
   
     <!-- Repo input form -->
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-        Name: <input type="text" name="repo" value="<?php echo $repo;?>">
+        Git Repository: <input type="text" name="repo" value="<?php echo $repo;?>">
         <span class="error">* <?php echo $repoErr;?></span>
         <br></br>
-        <input type="submit" name="form_repo_name" value="git clone"/>
+        <input type="submit" name="form_repo_name" value="git clone" class="waves-effect waves-light btn"/>
     </form>
 
     <!-- authn modal -->
@@ -97,21 +103,19 @@
         <span onclick="document.getElementById('clone_pwd_modal').style.display='none'" class="close" title="Close Modal">&times;</span>
         <!-- Modal Content -->
         <form method="post" class="modal-content animate" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-            <label><b>Password</b></label>
-            <br></br>
+            <h5>Password Required</h5>
+			<label><b>Git Repository</b></label>
             <input readonly value="<?php echo $repo; ?>" name="repo_name">
-            <br></br>
-            <input type="password" placeholder="Enter Password" name="pwd" required>
-            <br></br>
-            <button type="submit" name="form_repo_pwd">git clone</button>
+            <label><b>Password</b></label>
+            <input type="password" name="pwd" required>
+            <button type="submit" name="form_repo_pwd" class="waves-effect waves-light btn">git clone</button>
         </form>
     </div>
 
     <?php
         if (isset($_POST['form_repo_name'])) {
           if (isValidRepo($repo)) {
-            echo $repo;
-            $cmd = join(" ", array($cloneExec, $repo, $cloneDir, $dirName));
+            $cmd = join(" ", array($cloneExec, $repo, $cloneDir, $dirName, $_SESSION['user_id']));
             $exitCode = shell_exec($cmd);
 			$exitCode = trim($exitCode);
             echo "<pre>~~~\n$exitCode\n~~~</pre>";

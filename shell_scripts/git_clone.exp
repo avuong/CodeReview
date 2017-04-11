@@ -13,7 +13,7 @@ expect {
 			#send \003
 			#exp_continue
 		}
-	"*assword:"
+	"*assword*"
         {
             if { [string length $pwd] == 0 } {
                 exit 2

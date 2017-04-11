@@ -1,3 +1,21 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title> Group 2 Code Review Project</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,50" rel="stylesheet">
+
+	<!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
+
+  </head>
+  <body>
+  
+
 <?php
 	session_start();
 	$review_id = $_SESSION['review_id'];
@@ -35,3 +53,6 @@
 	oci_close($conn);
 	
 ?>
+
+</body>
+</html>

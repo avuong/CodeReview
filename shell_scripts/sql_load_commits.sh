@@ -1,14 +1,15 @@
 #! /bin/bash
 
 # Check for valid usage
-if [ $# -ne 2 ]; then
-    echo "usage: ./sql_load_commits.sh <local_repo> <review_id>"
+if [ $# -ne 3 ]; then
+    echo "usage: ./sql_load_commits.sh <local_repo> <review_id> <sql_userid>"
     exit 1
 fi
 
 # Collect input params
 local_repo=$1
 review_id=$2
+sql_userid=$3
 
 # Specified path must be a git repository
 git -C $local_repo rev-parse 2> /dev/null
@@ -16,6 +17,11 @@ if [ $? -ne 0 ]; then
     echo "error: Specified path is not a git repository"
     exit 1
 fi
+
+# Add the review to the database
+sql_cmd="INSERT INTO reviews (id, owner) \
+	VALUES ('$review_id', '$sql_userid');"
+echo $sql_cmd | sqlplus -S guest/guest
 
 # cd to the cloned repo
 cd $local_repo
