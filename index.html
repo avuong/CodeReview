@@ -4,27 +4,29 @@
   <head>
     <meta charset="utf-8">
     <title> Group 2 Code Review Project</title>
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,50" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/live/3.1/firebase.js"></script>
+	
+	<!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
 
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
+	
   </head>
   <body>
 
-    <h1> It Works! (group 2) </h1>
-  
-    <div class="container">
-      <input id="txtEmail" type="email" placeholder="Email">
+    <h1> ADB Code Review (Group 2) </h1>
+      <form action="./add_user.php" method="POST">
+        <label>User Name </label>
+        <input name="username" type="text" size="25" />
 
-      <input id="txtPass" type="password" placeholder="Password">
+        <label>Password: </label>
+        <input name="password" type="password" size="25" />
 
-      <button id="loginBtn" class="btn btn-action"> Log In </button>
+        <input name="mySubmit" type="submit" value="Sign Up!" />
+      </form>
 
-      <button id="SignUpBtn" class="btn btn-secondary"> Sign Up </button>
-
-      <button id="LogoutBtn" class="btn btn-action hide"> Log Out </button>
     </div>
 
-    <script src="./app.js"></script> 
   </body>
   
 </html>

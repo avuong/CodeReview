@@ -38,6 +38,15 @@
     //Create User
     const promise = auth.createUserWithEmailAndPassword(email,pass);
     promise.catch(e => console.log(e.message));
+
+    datastring = '&user_name=' + email;
+    $.ajax({
+      url: './add_user.php',
+      type: 'POST',
+      data: datastring, // it will serialize the form data
+      dataType: 'html'
+    })
+
     
   });
 
