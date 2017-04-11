@@ -15,11 +15,43 @@
   </head>
   <body>
   
+  <div class="container">
+  <form name="get_diff" action="./diff.php" method="POST" class="col s12" onsubmit="return validateForm()">
+	<div class="row">
+	  <div class="input-field col s6">
+        <input placeholder="Diff #1" name="diff1" type="text" required />
+	  </div>
+	  <div class="input-field col s6">
+        <input placeholder="Diff #2" name="diff2" type="text" required />
+	  </div>
+      <input name="diff_submit" type="submit" value="Get Diff!" class="waves-effect waves-light btn" />
+	</div>
+  </form>
+  </div>
+  
+  <script>
+  function validateForm() {
+	var d1 = document.forms["get_diff"]["diff1"].value;
+	var d2 = document.forms["get_diff"]["diff2"].value;
+	var patt = /\s/;
+	valid1 = d1.length==40 && !patt.test(d1);
+	valid2 = d2.length==40 && !patt.test(d2);
+	if (!valid1) {
+		alert("Diff #1 is not valid");
+		return false;
+	} else if (!valid2) {
+		alert("Diff #2 is not valid");
+		return false;
+	} else {
+		return true;
+	}
+  }
+  </script>
 
 <?php
 	session_start();
 	$review_id = $_SESSION['review_id'];
-	unset($_SESSION['review_id']);
+#	unset($_SESSION['review_id']);
 
 	require('login.php');
 

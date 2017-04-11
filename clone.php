@@ -95,7 +95,7 @@
       <h3> Create a Review </h3>
       <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
           <label><b>Git Repository:</b></label>
-		  <input type="text" name="repo" value="<?php echo $repo;?>">
+		  <input type="text" name="repo" value="<?php echo $repo;?>" autofocus="autofocus">
           <span class="error" style="color: red;"><?php echo $repoErr;?></span>
           <br></br>
           <input type="submit" name="form_repo_name" value="Create" class="waves-effect waves-light btn"/>

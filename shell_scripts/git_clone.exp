@@ -1,5 +1,5 @@
-#!/usr/bin/expect
-set timeout 5
+#!/usr/bin/expect -d
+set timeout 30
 
 set remote [lindex $argv 0]
 set local [lindex $argv 1]
@@ -12,6 +12,10 @@ expect {
 			exit 3
 			#send \003
 			#exp_continue
+		}
+	"*nvalid username or password*"
+		{
+			exit 3
 		}
 	"*assword*"
         {
