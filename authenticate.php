@@ -3,9 +3,9 @@
   $conn = oci_connect("guest", "guest")
   or die ("<br>Couldn't connect");
 
-  $input_name = 'test_user_82'; //$_POST["username"];
-  $input_pass = 'password'; //$_POST["password"];
-  
+  $input_name = $_POST["username"];
+  $input_pass = $_POST["password"];
+
   $query = "select salt, password from users where user_name='$input_name'";
   $stmt = oci_parse($conn, $query);
   //store table results into variable
@@ -17,7 +17,7 @@
   //hash provided password and compare with DB
   //
   $hash = hash("sha256", $input_pass . $salt);
-  
+
   //compare input pass and hashed pass
   if ($pass === $hash){
       print "LOGIN SUCCESSFUL";
