@@ -6,6 +6,12 @@
   $input_name = $_POST["username"];
   $input_pass = $_POST["password"];
 
+  //Error if fields are blank
+  if ($input_name === "" || $input_pass == ""){
+      echo "All fields required";
+      exit -1;
+  }
+
   $query = "select salt, password from users where user_name='$input_name'";
   $stmt = oci_parse($conn, $query);
   //store table results into variable
@@ -20,10 +26,10 @@
 
   //compare input pass and hashed pass
   if ($pass === $hash){
-      print "LOGIN SUCCESSFUL";
+      //If the login was successful
+      header('Location: clone.php');//takes you to this page after running the script
   } else{
       print "LOGIN FAILED. Please check username/password combination";
   }
 
-  //possible set session variables and pass onto next page?
 ?>

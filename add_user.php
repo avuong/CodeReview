@@ -27,6 +27,12 @@
   
   $name = $_POST["username"];
   $pass = $_POST["password"];
+
+  //If fields are left blank
+  if ($name === "" || $pass === ""){
+      echo "All fields are required";
+      exit -1;
+  }
   $response_arr = generateHashWithSalt($pass);
   $salt = $response_arr[0];
   $hash = $response_arr[1];
