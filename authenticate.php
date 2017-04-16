@@ -8,7 +8,7 @@
 
   //Error if fields are blank
   if ($input_name === "" || $input_pass == ""){
-      echo "All fields required";
+      echo "<div style = 'color:red'> *All fields required</div>";
       exit -1;
   }
 
@@ -21,15 +21,14 @@
   oci_fetch($stmt);
 
   //hash provided password and compare with DB
-  //
   $hash = hash("sha256", $input_pass . $salt);
 
   //compare input pass and hashed pass
   if ($pass === $hash){
       //If the login was successful
-       echo "<script>top.window.location = './clone.php'</script>";
+      echo "<script>top.window.location = './clone.php'</script>";
   } else{
-      print "LOGIN FAILED. Please check username/password combination";
+      print "<div style = 'color:red'>*LOGIN FAILED. Please check username/password combination</div>";
   }
 
 ?>

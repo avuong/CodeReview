@@ -30,7 +30,7 @@
 
   //If fields are left blank
   if ($name === "" || $pass === ""){
-      echo "All fields are required";
+      echo "<div style = 'color:red'> *All fields required</div>";
       exit -1;
   }
   $response_arr = generateHashWithSalt($pass);
@@ -50,7 +50,7 @@
   $err = array();
   //TODO: see if there are better errors messages (i.e. return code for unique user constraint?)
   if (!$r) {
-    echo "Something went wrong with the query";
+    echo "<div style = 'color:red'>*Something went wrong with the query</div>";
     oci_close($conn);
   } else{
     oci_close($conn);
