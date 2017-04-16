@@ -10,23 +10,45 @@
 
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
-	
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+
   </head>
   <body class="valign-wrapper">
 
 	<div class="valign container">
 	  <h3> ADB Code Review Sign Up </h3>
       
-	  <form action="./add_user.php" method="POST">
+	  <form action="" id="signUp"  method="POST">
         <label>User Name</label>
         <input name="username" type="text" size="25" />
 
         <label>Password:</label>
         <input name="password" type="password" size="25" />
 
-        <input name="mySubmit" type="submit" value="Sign Up!" class="waves-effect waves-light btn" />
+        <input name="mySubmit" id="button_click" type="button"  value="Sign Up!" class="waves-effect waves-light btn" />
       </form>
 
+   <script type="text/javascript">
+     $("#button_click").on("click", function(){
+        var postData = $("#signUp").serializeArray();
+        var request = $.ajax({
+          url: "./add_user.php", // Ofcourse this would be your addLike.php in your real script
+          type: "POST",
+          data: postData,
+          success: function(data){
+            $('#resultDiv').html(data);
+          }
+        });
+        
+        request.fail(function(jqXHR, textStatus) {
+          alert( "Request failed: " + textStatus );
+        });
+        
+        return false;    
+    }); 
+   </script> 
+     
+      <div id=resultDiv></div>
     </div>
 
   </body>

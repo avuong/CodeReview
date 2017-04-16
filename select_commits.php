@@ -6,16 +6,21 @@
     <title> Group 2 Code Review Project</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,50" rel="stylesheet">
 
+	<!-- Materialize -->
 	<!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
-
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
+	
+	<!-- gitgraph -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitgraph.js/1.10.0/gitgraph.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gitgraph.js/1.10.0/gitgraph.js"></script>
 
   </head>
   <body>
   
   <div class="container">
+  <canvas id="gitGraph"></canvas>
   <form name="get_diff" action="./diff.php" method="POST" class="col s12" onsubmit="return validateForm()">
 	<div class="row">
 	  <div class="input-field col s6">

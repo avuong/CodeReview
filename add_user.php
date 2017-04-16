@@ -48,13 +48,14 @@
   oci_bind_by_name($stmt,':salt', $salt);
   $r = oci_execute($stmt);
   $err = array();
-  //TODO: see if there are better errors messages
+  //TODO: see if there are better errors messages (i.e. return code for unique user constraint?)
   if (!$r) {
     echo "Something went wrong with the query";
     oci_close($conn);
   } else{
     oci_close($conn);
-    header('Location: clone.php');//takes you to this page after running the script
+    //header('Location: clone.php');//takes you to this page after running the script
+    echo "<script>top.window.location = './clone.php'</script>";
   }
 ?>
 

@@ -27,7 +27,7 @@
   //compare input pass and hashed pass
   if ($pass === $hash){
       //If the login was successful
-      header('Location: clone.php');//takes you to this page after running the script
+       echo "<script>top.window.location = './clone.php'</script>";
   } else{
       print "LOGIN FAILED. Please check username/password combination";
   }
