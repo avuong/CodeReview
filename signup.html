@@ -32,7 +32,7 @@
      $("#button_click").on("click", function(){
         var postData = $("#signUp").serializeArray();
         var request = $.ajax({
-          url: "./add_user.php", // Ofcourse this would be your addLike.php in your real script
+          url: "./add_user.php",
           type: "POST",
           data: postData,
           success: function(data){

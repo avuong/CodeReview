@@ -67,14 +67,14 @@ EOT;
   
   <div id="mySidenav" class="sidenav container">
   <h5>Select two commits</h5>
-  <form name="get_diff" action="./diff.php" method="POST" onsubmit="return validateForm()">
+  <form name="get_diff" action="" id="get_diff" method="POST" onsubmit="return validateForm()">
         <input placeholder="Commit #1" name="diff1" id="commit1" type="text" required readonly/>
         <input placeholder="Commit #2" name="diff2" id="commit2" type="text" required readonly/>
-      <input name="diff_submit" type="submit" value="Get Diff!" class="waves-effect waves-light btn" />
+      <input name="diff_submit" id="diff_submit" type="button" value="Get Diff!" class="waves-effect waves-light btn" />
   </form>
   </div>
   <canvas id="gitGraph"></canvas>
-  
+
   <script>
 	// populate GitGraph
 	var commitTree = <?php echo $commit_tree; ?>;
@@ -222,7 +222,29 @@ EOT;
 		return true;
 	}
   }
+
   </script>
 
+  <script type="text/javascript">
+     $("#diff_submit").on("click", function(){
+        var postData = $("#get_diff").serializeArray();
+        var request = $.ajax({
+          url: "./diff.php",
+          type: "POST",
+          data: postData,
+          success: function(data){
+            $('#resultDiv').html(data);
+          }
+        });
+        
+        request.fail(function(jqXHR, textStatus) {
+          alert( "Request failed: " + textStatus );
+        });
+        
+        return false;    
+    }); 
+   </script>
+
+      <div style="text-align:right;" id=resultDiv></div>
 </body>
 </html>
