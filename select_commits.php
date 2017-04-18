@@ -6,6 +6,9 @@
     <title> Group 2 Code Review Project</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,50" rel="stylesheet">
 
+	<!-- JQuery -->
+	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+	
 	<!-- Materialize -->
 	<!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
@@ -16,25 +19,193 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitgraph.js/1.10.0/gitgraph.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gitgraph.js/1.10.0/gitgraph.js"></script>
 
+	<!-- custom css -->
+	<link rel="stylesheet" href="select_commits.css">
   </head>
   <body>
   
-  <div class="container">
-  <canvas id="gitGraph"></canvas>
-  <form name="get_diff" action="./diff.php" method="POST" class="col s12" onsubmit="return validateForm()">
-	<div class="row">
-	  <div class="input-field col s6">
-        <input placeholder="Diff #1" name="diff1" type="text" required />
-	  </div>
-	  <div class="input-field col s6">
-        <input placeholder="Diff #2" name="diff2" type="text" required />
-	  </div>
+  <?php
+	session_start();
+	$review_id = $_SESSION['review_id'];
+
+	// https://gist.github.com/varemenos/e95c2e098e657c7688fd
+	$gitlog = <<< EOT
+	git log --reverse --pretty=format:'{
+		%n  "commit": "%H",
+		%n  "abbreviated_commit": "%h",
+		%n  "tree": "%T",
+		%n  "abbreviated_tree": "%t",
+		%n  "parent": "%P",
+		%n  "abbreviated_parent": "%p",
+		%n  "refs": "%D",
+		%n  "encoding": "%e",
+		%n  "subject": "%s",
+		%n  "sanitized_subject_line": "%f",
+		%n  "body": "%b",
+		%n  "commit_notes": "%N",
+		%n  "verification_flag": "%G?",
+		%n  "signer": "%GS",
+		%n  "signer_key": "%GK",
+		%n  "author": {
+			%n    "name": "%aN",
+			%n    "email": "%aE",
+			%n    "date": "%aD"%n  
+		},
+		%n  "commiter": {
+			%n    "name": "%cN",
+			%n    "email": "%cE",
+			%n    "date": "%cD"%n  
+		}%n},'
+EOT;
+	$format = <<< EOT
+	| sed "$ s/,$//" | tr '\r\n' ' ' | awk 'BEGIN { print("[") } { print($0) } END { print("]") }'
+EOT;
+	$cmd = "cd /tmp/git_clone/$review_id && $gitlog $format";
+	$commit_tree = shell_exec($cmd);
+	#echo "<pre>$commit_tree</pre>";
+  ?>
+  
+  <div id="mySidenav" class="sidenav container">
+  <h5>Select two commits</h5>
+  <form name="get_diff" action="./diff.php" method="POST" onsubmit="return validateForm()">
+        <input placeholder="Commit #1" name="diff1" id="commit1" type="text" required readonly/>
+        <input placeholder="Commit #2" name="diff2" id="commit2" type="text" required readonly/>
       <input name="diff_submit" type="submit" value="Get Diff!" class="waves-effect waves-light btn" />
-	</div>
   </form>
   </div>
+  <canvas id="gitGraph"></canvas>
   
   <script>
+	// populate GitGraph
+	var commitTree = <?php echo $commit_tree; ?>;
+	console.log(commitTree);
+	children = {};
+	for (var i=0; i<commitTree.length; ++i) {
+	  var commit = commitTree[i].commit;
+	  var parent = commitTree[i].parent;
+	  children[parent] = children[parent] || [];
+	  children[parent].push(commit);
+	}
+	
+	console.log(children);
+	var gitgraph = new GitGraph({
+		template: "metro",
+		orientation: "vertical-reverse",
+		mode: "extended"
+	});
+	gitgraph.template.commit.message.displayBranch = false;
+	gitgraph.template.commit.dot.strokeColor = "#FFD600";
+	gitgraph.canvas.addEventListener("commit:mouseover", function (event) {
+		this.style.cursor = "pointer";
+	});
+	gitgraph.canvas.addEventListener("commit:mouseout", function (event) {
+		this.style.cursor = "auto";
+	});
+	console.log(gitgraph);
+	
+	var master = gitgraph.branch("master");
+
+	var visited = {};
+	var map_head = {};
+	map_head[""] = master;
+	
+	function clicked(obj) {
+		console.log(obj);
+		var c1 = document.getElementById("commit1");
+		var c2 = document.getElementById("commit2");
+		
+		if (!obj.representedObject.selected) {
+
+			if (c1.value && c2.value) {
+				alert("There are already two commits selected.");
+			} else if (c1.value) {
+				c2.value = obj.representedObject.commit;
+				obj.tag = "Commit #2";
+				obj.representedObject.selected = true;
+				obj.dotStrokeWidth = 20;
+			} else {
+				c1.value = obj.representedObject.commit;
+				obj.tag = "Commit #1";
+				obj.representedObject.selected = true;
+				obj.dotStrokeWidth = 20;
+			}
+		} else {
+			obj.representedObject.selected = false;
+			obj.dotStrokeWidth = null;
+			if (obj.tag === "Commit #1")
+				c1.value = "";
+			else
+				c2.value = "";
+			obj.tag = null;
+		}
+		gitgraph.render();
+	}
+	
+	function isChildOf(child, parent) {
+		var curr = child;
+		while (curr.parentBranch) {
+			if (curr.parentBranch === parent) 
+				return true;
+			curr = curr.parentBranch;
+		}
+		return false;
+	}
+	
+	for (var i=0; i<commitTree.length; ++i) {
+	  var parent = commitTree[i].parent;
+	  var commit = commitTree[i].commit;
+	  
+	  var message = commitTree[i].subject;
+	  var author = commitTree[i].author.email;
+	  var sha1 = commitTree[i].abbreviated_commit;
+	  var commitMessage = {
+		  message: message, 
+		  author: author, 
+		  sha1: sha1,
+		  showLabel: true,
+		  representedObject: { // https://github.com/nicoespeon/gitgraph.js/blob/develop/src/gitgraph.js#L659
+			  commit: commit,
+			  selected: false
+		  },
+		  onClick: function(){
+//			  clicked(this.representedObject);
+			  clicked(this);
+		  }
+	  };
+	  /*
+	  console.log(commitTree[i]);
+	  console.log(commit);
+	  console.log(parent);
+	  */
+	  if (children[parent].length > 1 && !visited[parent]) {
+		// First child found where a branch was created
+		// - branch, then commit
+		map_head[commit] = map_head[parent].branch(sha1);
+		map_head[commit].commit(commitMessage);
+		visited[parent] = true;
+	  } else if (children[parent].length > 1) {
+		// Second (or higher) child found where a branch was created
+			// - just commit
+		map_head[parent].commit(commitMessage);
+		map_head[commit] = map_head[parent];
+	  } else if (parent.split(" ").length > 1) {
+		// Merge commit
+		var [b1, b2] = parent.split(" ");
+		if (isChildOf(map_head[b1], map_head[b2])) {
+			map_head[b1].merge(map_head[b2], commitMessage);
+			map_head[commit] = map_head[b2];
+		} else {
+			map_head[b2].merge(map_head[b1], commitMessage);
+			map_head[commit] = map_head[b1];
+		}
+	  } else {
+		// Standard commit
+		map_head[parent].commit(commitMessage);
+		map_head[commit] = map_head[parent];
+	  }
+	}
+
+  
   function validateForm() {
 	var d1 = document.forms["get_diff"]["diff1"].value;
 	var d2 = document.forms["get_diff"]["diff2"].value;
@@ -52,44 +223,6 @@
 	}
   }
   </script>
-
-<?php
-	session_start();
-	$review_id = $_SESSION['review_id'];
-#	unset($_SESSION['review_id']);
-
-	require('login.php');
-
-	// Prepare the statement
-	$stid = oci_parse($conn, "SELECT * FROM commits WHERE review_id='".$review_id."'");
-	echo "SELECT * FROM commits WHERE review_id='".$review_id."'";
-	if (!$stid) {
-		$e = oci_error($conn);
-		trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
-	}
-
-	// Perform the logic of the query
-	$r = oci_execute($stid);
-	if (!$r) {
-		$e = oci_error($stid);
-		trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
-	}
-
-	// Fetch the results of the query
-	print "<table border='1'>\n";
-	while ($row = oci_fetch_array($stid, OCI_ASSOC+OCI_RETURN_NULLS)) {
-		print "<tr>\n";
-		foreach ($row as $item) {
-			print "    <td>" . ($item !== null ? htmlentities($item, ENT_QUOTES) : "&nbsp;") . "</td>\n";
-		}
-		print "</tr>\n";
-	}
-	print "</table>\n";
-
-	oci_free_statement($stid);
-	oci_close($conn);
-	
-?>
 
 </body>
 </html>
