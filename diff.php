@@ -11,19 +11,21 @@
 
     $diff_lines = explode("\n", $output);
 
+    
+    #echo "int main()";
+    #echo "<p>var test</p>";
     #echo out each line 
     #green line for +'s and red line for -'s none for no changes
     for($i = 0; $i <= count($diff_lines); $i++){
       if( !empty($diff_lines[$i])){  
         if ($diff_lines[$i][0] === '+'){
-          echo "<div style = 'color:green'>$diff_lines[$i]</div>";
+          echo "<div style = 'background-color:#dbffdb'>$diff_lines[$i]</div>";
         }elseif ($diff_lines[$i][0] === '-'){
-          echo "<div style = 'color:red'>$diff_lines[$i]</div>";
+          echo "<div style = 'background-color:#f1c0c0'>$diff_lines[$i]</div>";
         }else{
-          echo "$diff_lines[$i]";
+          echo "<div>$diff_lines[$i]</div>";
         }
       }
     }
-
     #echo "<div style = 'color:red'><pre>$output</pre></div>";
 ?>

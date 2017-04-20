@@ -14,14 +14,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
-	
+
+    <!--Prettify for syntax highlighting -->
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script>
+
 	<!-- gitgraph -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitgraph.js/1.10.0/gitgraph.css">
+    
+    <!-- AJAX -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gitgraph.js/1.10.0/gitgraph.js"></script>
 
-	<!-- custom css -->
+    <!-- custom css -->
 	<link rel="stylesheet" href="select_commits.css">
-  </head>
+
+
+</head>
   <body>
   
   <?php
@@ -225,7 +234,8 @@ EOT;
 
   </script>
 
-  <script type="text/javascript">
+    <script type="text/javascript">
+
      $("#diff_submit").on("click", function(){
         var postData = $("#get_diff").serializeArray();
         var request = $.ajax({
@@ -234,6 +244,8 @@ EOT;
           data: postData,
           success: function(data){
             $('#resultDiv').html(data);
+            $('#modal1').modal('open');
+            hljs.initHighlighting()
           }
         });
         
@@ -242,9 +254,29 @@ EOT;
         });
         
         return false;    
-    }); 
+     });
+
+      $(document).ready(function(){
+    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+    $('.modal').modal();
+  });
    </script>
 
-      <div style="text-align:right;" id=resultDiv></div>
+<script>hljs.initHighlightingOnLoad();</script>
+  <!-- Modal Structure -->
+  <div id="modal1" class="modal modal-fixed-footer">
+    <div class="modal-content">
+      <h4>Diff Review</h4>
+         <pre>
+           <code id=resultDiv style="text-align:right;">
+           </code>
+         </pre>
+     </div>
+    <div class="modal-footer">
+      <a href="./create_review.php" class="modal-action modal-close waves-effect waves-green btn-flat ">Submit</a>
+    </div>
+  </div>
+
+
 </body>
 </html>
