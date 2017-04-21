@@ -11,9 +11,7 @@
 
     $diff_lines = explode("\n", $output);
 
-    
-    #echo "int main()";
-    #echo "<p>var test</p>";
+
     #echo out each line 
     #green line for +'s and red line for -'s none for no changes
     for($i = 0; $i <= count($diff_lines); $i++){

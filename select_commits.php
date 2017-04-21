@@ -245,7 +245,7 @@ EOT;
           success: function(data){
             $('#resultDiv').html(data);
             $('#modal1').modal('open');
-            hljs.initHighlighting()
+            hljs.highlightBlock(document.getElementById("resultDiv"));
           }
         });
         
@@ -268,7 +268,7 @@ EOT;
     <div class="modal-content">
       <h4>Diff Review</h4>
          <pre>
-           <code id=resultDiv style="text-align:right;">
+           <code id=resultDiv >
            </code>
          </pre>
      </div>
