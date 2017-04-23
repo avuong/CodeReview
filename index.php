@@ -10,13 +10,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
 
   </head>
- 
 
   <body class="valign-wrapper">
 
-	<?php
-	      require("authenticate_visitor.php");
-	?>
+	<?php require("authenticate_visitor.php"); ?>
 
 	<div class="valign container">
 	  <h3> ADB Code Review Sign In<i>(Group 2)</i> </h3>

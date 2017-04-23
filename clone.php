@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 
+<?php require("authenticate_visitor.php"); ?>
+
 <html>
   <head>
     <meta charset="utf-8">
     <title> Group 2 Code Review Project</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,50" rel="stylesheet">
 
-	<!-- Compiled and minified CSS -->
+	<!-- JQuery -->
+	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<!-- Materialize -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
-
-    <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
 	
   </head>
-  <body class="valign-wrapper">
-  
+  <body>
+	<?php include("navbar.php"); ?>
+		
     <?php
-      require("authenticate_visitor.php");
-
 	  $hostname = "52.34.131.50";
 	  $port = "8172";
 	  $onSuccessPhp = "select_commits.php";
@@ -90,6 +91,8 @@
  
     ?>
   
+  	<div class="valign-wrapper">
+
     <!-- Repo input form -->
 	<div class="valign container">
       <h3> Create a Review </h3>
@@ -157,6 +160,10 @@
 		width: 100%;
 		height: 100%;
 	}
+	div.valign-wrapper {
+		width: 100%;
+		height: 100%;
+	}
 	
 /* The Modal (background) */
 .modal {
@@ -216,7 +223,7 @@
 }
     </style>
 
-
+	</div>
   </body>
   
 </html>
