@@ -5,10 +5,8 @@
     <meta charset="utf-8">
     <title> Group 2 Code Review Project</title>
 	
-	<!-- Compiled and minified CSS -->
+	<!-- Materialize -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
-
-    <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
 
   </head>
@@ -16,12 +14,14 @@
 
   <body class="valign-wrapper">
 
-
+	<?php
+	      require("authenticate_visitor.php");
+	?>
 
 	<div class="valign container">
 	  <h3> ADB Code Review Sign In<i>(Group 2)</i> </h3>
       
-	  <form id="SignIn" action="./authenticate.php" target="myIframe" method="POST">
+	  <form id="SignIn" action="./authenticate_signin.php" target="myIframe" method="POST">
         <label>User Name</label>
         <input name="username" type="text" size="25" />
 

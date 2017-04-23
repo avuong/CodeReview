@@ -1,4 +1,5 @@
 <?php
+  session_start();
 
   $conn = oci_connect("guest", "guest")
   or die ("<br>Couldn't connect");
@@ -25,7 +26,17 @@
 
   //compare input pass and hashed pass
   if ($pass === $hash){
-      //If the login was successful
+      //If the login was successful then grant them a session
+	  $session_key = session_id();
+	  $query = "INSERT into SESSIONS(user_id, session_key, session_address, session_useragent) values((SELECT id FROM users WHERE user_name = :user_name), :session_key, :session_address, :session_useragent)";
+	  $stmt = oci_parse($conn, $query);
+	  oci_bind_by_name($stmt,':user_name', $input_name);
+	  oci_bind_by_name($stmt,':session_key', $session_key);
+	  oci_bind_by_name($stmt,':session_address', $_SERVER['REMOTE_ADDR']);
+	  oci_bind_by_name($stmt,':session_useragent', $_SERVER['HTTP_USER_AGENT']);
+	  oci_execute($stmt);
+	  oci_close($conn);
+  
       echo "<script>top.window.location = './clone.php'</script>";
   } else{
       print "<div style = 'color:red'>*LOGIN FAILED. Please check username/password combination</div>";

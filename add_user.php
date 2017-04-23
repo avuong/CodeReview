@@ -53,6 +53,15 @@
     echo "<div style = 'color:red'>*Something went wrong with the query</div>";
     oci_close($conn);
   } else{
+	// after adding a new user, grant them a new session_cache_expire
+	$session_key = session_id();
+	$query = "INSERT into SESSIONS(user_id, session_key, session_address, session_useragent) values(:user_id, :session_key, :session_address, :session_useragent)";
+	$stmt = oci_parse($conn, $query);
+	oci_bind_by_name($stmt,':user_id', $user_id);
+	oci_bind_by_name($stmt,':session_key', $session_key);
+	oci_bind_by_name($stmt,':session_address', $_SERVER['REMOTE_ADDR']);
+	oci_bind_by_name($stmt,':session_useragent', $_SERVER['HTTP_USER_AGENT']);
+	oci_execute($stmt);
     oci_close($conn);
     //header('Location: clone.php');//takes you to this page after running the script
     echo "<script>top.window.location = './clone.php'</script>";

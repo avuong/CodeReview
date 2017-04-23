@@ -16,7 +16,7 @@
   <body class="valign-wrapper">
   
     <?php
-      session_start();
+      require("authenticate_visitor.php");
 
 	  $hostname = "52.34.131.50";
 	  $port = "8172";
