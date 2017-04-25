@@ -234,23 +234,43 @@ EOT;
 
     <script type="text/javascript">
 
-     $("#diff_submit").on("click", function(){
-        var postData = $("#get_diff").serializeArray();
-        var request = $.ajax({
+    var last_line = -1;
+    
+    function requestDiffData(postData) {
+      var request = $.ajax({
           url: "./diff.php",
           type: "POST",
           data: postData,
+          dataType: 'json',
+          
           success: function(data){
-            $('#resultDiv').html(data);
+            last_line = data.last_line;
+            end_of_diff = data.end_of_diff;
+            if (end_of_diff) {
+              $('#load_more_diff').hide();
+            }
+            $('#resultDiv').html(function(index, currentcontent) {
+              return currentcontent + data.diff;
+            });
             $('#modal1').modal('open');
             hljs.highlightBlock(document.getElementById("resultDiv"));
           }
         });
-        
         request.fail(function(jqXHR, textStatus) {
           alert( "Request failed: " + textStatus );
         });
-        
+    }
+           
+     $("#diff_submit").on("click", function(){
+        var postData = $("#get_diff").serializeArray();
+        requestDiffData(postData);
+        return false;    
+     });
+     
+     $("body").on("click", "#load_more_diff", function(){
+        var postData = $("#get_diff").serializeArray();
+        postData.push({name: "last_line", value: last_line});
+        requestDiffData(postData);
         return false;    
      });
 
@@ -262,16 +282,19 @@ EOT;
 
 <script>hljs.initHighlightingOnLoad();</script>
   <!-- Modal Structure -->
-  <div id="modal1" class="modal modal-fixed-footer">
-    <div class="modal-content">
-      <div class="modal-header"><h4>Diff Review</h4></div>
-	  <div class="modal-body">
-         <pre>
+  <div id="modal1" class="modal modal-fixed-footer modal-fixed-header">
+    <div class="modal-header">
+      <h4 style="margin: 0; padding: 15px 0px 5px 15px;">Diff Review</h4>
+    </div>
+    <div class="modal-content" style="padding-top: 0; padding-bottom: 56px;">
+      <div class="modal-body">
+         <pre style="margin: 0;">
            <code id=resultDiv >
            </code>
          </pre>
-	  </div>
-	</div>
+         <a id="load_more_diff" class="waves-effect waves-light btn">View More</a>
+      </div>
+    </div>
     <div class="modal-footer">
       <a href="./create_review.php" class="modal-action modal-close waves-effect waves-green btn-flat ">Submit</a>
     </div>
