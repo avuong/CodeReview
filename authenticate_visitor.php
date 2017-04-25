@@ -1,4 +1,5 @@
 <?php
+
   session_start();
   $session_key = session_id();
 
@@ -31,7 +32,7 @@
   
     oci_close($conn);
   
-    if ($_SERVER['REQUEST_URI'] === "/index.php") {
+    if ($_SERVER['REQUEST_URI'] === "/index.php" || $_SERVER['REQUEST_URI'] === "/" ) {
 	  header("Location: clone.php");
 	  exit;
     }

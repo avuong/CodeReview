@@ -3,18 +3,10 @@
 <?php require("authenticate_visitor.php"); ?>
 
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title> Group 2 Code Review Project</title>
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,50" rel="stylesheet">
-
-	<!-- JQuery -->
-	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-	<!-- Materialize -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
-	
-  </head>
+  <?php
+	$title = "Clone";
+	include("head.php"); 
+	?>
   <body>
 	<?php include("navbar.php"); ?>
 		

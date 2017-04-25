@@ -1,0 +1,5 @@
+# Make style/color changes
+vi components/_variables.scss
+
+# Recompile sass into css
+sass materialize.scss materialize.css

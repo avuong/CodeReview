@@ -37,6 +37,7 @@
 	session_start();
 	$review_id = $_SESSION['review_id'];
 
+	// Generate a log of all git commits in a pretty printed JSON format
 	// https://gist.github.com/varemenos/e95c2e098e657c7688fd
 	$gitlog = <<< EOT
 	git log --reverse --pretty=format:'{
@@ -85,7 +86,12 @@ EOT;
   <canvas id="gitGraph"></canvas>
 
   <script>
-	// populate GitGraph
+	/*
+	 * Generate a GitGraph representation of the git repo
+	 */
+	 // Git commits store the parent commits, but not the children commits.
+	 // Loop through all commits and build a dict that keeps track of
+	 // children commits.
 	var commitTree = <?php echo $commit_tree; ?>;
 	console.log(commitTree);
 	children = {};
@@ -95,8 +101,9 @@ EOT;
 	  children[parent] = children[parent] || [];
 	  children[parent].push(commit);
 	}
-	
 	console.log(children);
+	
+	// Create the GitGraph object and set template properties
 	var gitgraph = new GitGraph({
 		template: "metro",
 		orientation: "vertical-reverse",
@@ -111,13 +118,14 @@ EOT;
 		this.style.cursor = "auto";
 	});
 	console.log(gitgraph);
-	
 	var master = gitgraph.branch("master");
 
+	// Data structures used to keep track of branching and merging
 	var visited = {};
 	var map_head = {};
 	map_head[""] = master;
 	
+	// Called when a commit node is clicked on
 	function clicked(obj) {
 		console.log(obj);
 		var c1 = document.getElementById("commit1");
@@ -150,6 +158,7 @@ EOT;
 		gitgraph.render();
 	}
 	
+	// determines if the child branch is a descendent of the parent branch
 	function isChildOf(child, parent) {
 		var curr = child;
 		while (curr.parentBranch) {
@@ -160,6 +169,7 @@ EOT;
 		return false;
 	}
 	
+	// Loop through all commits and populate the GitGraph
 	for (var i=0; i<commitTree.length; ++i) {
 	  var parent = commitTree[i].parent;
 	  var commit = commitTree[i].commit;
@@ -189,7 +199,8 @@ EOT;
 	  if (children[parent].length > 1 && !visited[parent]) {
 		// First child found where a branch was created
 		// - branch, then commit
-		map_head[commit] = map_head[parent].branch(sha1);
+		var new_branch = map_head[parent].branch({name: sha1});
+		map_head[commit] = new_branch;
 		map_head[commit].commit(commitMessage);
 		visited[parent] = true;
 	  } else if (children[parent].length > 1) {
@@ -266,17 +277,18 @@ EOT;
   <!-- Modal Structure -->
   <div id="modal1" class="modal modal-fixed-footer">
     <div class="modal-content">
-      <h4>Diff Review</h4>
+      <div class="modal-header"><h4>Diff Review</h4></div>
+	  <div class="modal-body">
          <pre>
-           <code id=resultDiv >
+           <code id=resultDiv>
            </code>
          </pre>
-     </div>
+	  </div>
+	</div>
     <div class="modal-footer">
       <a href="./create_review.php" class="modal-action modal-close waves-effect waves-green btn-flat ">Submit</a>
     </div>
   </div>
-
 
 </body>
 </html>

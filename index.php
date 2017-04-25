@@ -6,8 +6,12 @@
     <title> Group 2 Code Review Project</title>
 	
 	<!-- Materialize -->
+<!--
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
+-->	
+	<link rel="stylesheet" href="materialize-src/sass/materialize.css">
+    <script src="materialize-src/js/bin/materialize.min.js"></script>
 
   </head>
 
