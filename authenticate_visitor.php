@@ -18,11 +18,11 @@
   
   // if the user does not have a valid session...
   if(empty($session_id)) {
-	// if the user is not logged in and they are not already trying to login, then redirect them to login
-	if ($_SERVER['REQUEST_URI'] !== "/index.php") {
-	  header('Location: index.php');
-	  exit;
-	}
+    // if the user is not logged in and they are not already trying to login, then redirect them to login
+    if ($_SERVER['REQUEST_URI'] !== "/index.php") {
+      header('Location: index.php');
+      exit;
+    }
   // else the user has a valid session; update their session expiration time
   } else {
     $query = "UPDATE sessions SET session_expires = (sysdate + 1/24) WHERE id = :session_id";
@@ -33,8 +33,8 @@
     oci_close($conn);
   
     if ($_SERVER['REQUEST_URI'] === "/index.php" || $_SERVER['REQUEST_URI'] === "/" ) {
-	  header("Location: clone.php");
-	  exit;
+      header("Location: clone.php");
+      exit;
     }
   }
   

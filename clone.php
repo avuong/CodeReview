@@ -7,13 +7,15 @@
 	$title = "Clone";
 	include("head.php"); 
 	?>
+  
   <body>
+  
 	<?php include("navbar.php"); ?>
 		
     <?php
-	  $hostname = "52.34.131.50";
-	  $port = "8172";
-	  $onSuccessPhp = "select_commits.php";
+      $hostname = "52.34.131.50";
+      $port = "8172";
+      $onSuccessPhp = "select_commits.php";
 	  
       $cloneExec = "/home/ec2-user/apache/htdocs/shell_scripts/clone.sh";
       $cloneDir = "/tmp/git_clone";
@@ -22,7 +24,7 @@
       $SUCCESS     = "0";
       $ERROR       = "1";
       $AUTHN       = "2";
-	  $PERM_DENIED = "3";
+      $PERM_DENIED = "3";
 
       $repoErr = "";
       $repo = "";
@@ -43,7 +45,7 @@
         if (isset($_POST['form_repo_pwd'])) {
             $cmd = join(" ", array($cloneExec, $_POST['repo_name'], $cloneDir, $dirName, $_SESSION['user_id'], $_POST['pwd']));
             $exitCode = shell_exec($cmd);
-			$exitCode = trim($exitCode);
+            $exitCode = trim($exitCode);
             #echo "<pre>$exitCode</pre>";
             
             if ($exitCode == $PERM_DENIED) {
@@ -86,7 +88,7 @@
   	<div class="valign-wrapper">
 
     <!-- Repo input form -->
-	<div class="valign container">
+    <div class="valign container">
       <h3> Create a Review </h3>
       <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
           <label><b>Git Repository:</b></label>
@@ -95,7 +97,7 @@
           <br></br>
           <input type="submit" name="form_repo_name" value="Create" class="waves-effect waves-light btn"/>
       </form>
-	</div>
+    </div>
 
     <!-- authn modal -->
     <div id="clone_pwd_modal" class="modal">

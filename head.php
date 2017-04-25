@@ -16,4 +16,9 @@ if (!isset($title)) {
   <link rel="stylesheet" href="materialize-src/sass/materialize.css">
   <script src="materialize-src/js/bin/materialize.min.js"></script>
 	
+  <?php
+  if (isset($include)) {
+    echo $include;
+  }
+  ?>
 </head>

@@ -1,40 +1,27 @@
 <!DOCTYPE html>
 
+<?php require("authenticate_visitor.php"); ?>
+
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title> Group 2 Code Review Project</title>
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,50" rel="stylesheet">
-
-	<!-- JQuery -->
-	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-	
-	<!-- Materialize -->
-	<!-- Compiled and minified CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/css/materialize.min.css">
-    <!-- Compiled and minified JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js"></script>
-
-    <!--Prettify for syntax highlighting -->
-    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/default.min.css">
-<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script>
-
-	<!-- gitgraph -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitgraph.js/1.10.0/gitgraph.css">
-    
-    <!-- AJAX -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gitgraph.js/1.10.0/gitgraph.js"></script>
-
-    <!-- custom css -->
-	<link rel="stylesheet" href="select_commits.css">
-
-
-</head>
+  <?php
+    $title = "Diff Selection";
+    $include = '
+      <!-- Prettify for syntax highlighting -->
+      <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+      <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/default.min.css">
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script>
+      <!-- GitGraph -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitgraph.js/1.10.0/gitgraph.css">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/gitgraph.js/1.10.0/gitgraph.js"></script>
+      <!-- custom css -->
+      <link rel="stylesheet" href="select_commits.css">
+    ';
+    include("head.php"); 
+	?>
+  
   <body>
   
   <?php
-	session_start();
 	$review_id = $_SESSION['review_id'];
 
 	// Generate a log of all git commits in a pretty printed JSON format
@@ -280,7 +267,7 @@ EOT;
       <div class="modal-header"><h4>Diff Review</h4></div>
 	  <div class="modal-body">
          <pre>
-           <code id=resultDiv>
+           <code id=resultDiv >
            </code>
          </pre>
 	  </div>
