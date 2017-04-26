@@ -86,12 +86,17 @@
     <script>      
       $(function() {
         /* Instantiate Material Chips */
-        $('.chips').material_chip();
+        $('#add_user_chip').material_chip({
+          placeholder: "add user"
+        });
+        $('#add_group_chip').material_chip({
+          placeholder: "add group"
+        });
         // keep track of chip data
         var $user_chip = $('#add_user_chip');
-        var user_chip_data = $user_chip.material_chip('data');
+        var user_chip_data = $user_chip.material_chip('data').slice();
         var $group_chip = $('#add_group_chip');
-        var group_chip_data = $group_chip.material_chip('data');        
+        var group_chip_data = $group_chip.material_chip('data').slice();    
         
         /*
          * Add autocomplete to Reviewer input fields
@@ -104,14 +109,15 @@
               minChars: 2,
               autoSelectFirst: true,
               onSelect: function (suggestion) {
-                user_chip_data = $user_chip.material_chip('data');
+                user_chip_data = $user_chip.material_chip('data').slice();
                 var chip = {
                   id: suggestion.data,
                   tag: suggestion.value
                 };
                 user_chip_data.push(chip);
                 $user_chip.material_chip({
-                  data: user_chip_data
+                  data: user_chip_data.slice(),
+                  secondaryPlaceholder: "add another user"
                 });
                 addUserReviewerListener();
               }
@@ -125,14 +131,14 @@
               minChars: 2,
               autoSelectFirst: true,
               onSelect: function (suggestion) {
-                group_chip_data = $group_chip.material_chip('data');
+                group_chip_data = $group_chip.material_chip('data').slice();
                 var chip = {
                   id: suggestion.data,
                   tag: suggestion.value
                 };
                 group_chip_data.push(chip);
                 $group_chip.material_chip({
-                  data: group_chip_data
+                  data: group_chip_data.slice()
                 });
                 addGroupReviewerListener();
               }
@@ -151,27 +157,21 @@
          */
         $user_chip.on('chip.add', function(e, chip){
           $user_chip.material_chip({
-            data: user_chip_data
+            data: user_chip_data.slice()
           });
           addUserReviewerListener();
         });
         $group_chip.on('chip.add', function(e, chip){
           $group_chip.material_chip({
-            data: group_chip_data
+            data: group_chip_data.slice()
           });
           addGroupReviewerListener();
         });
         $user_chip.on('chip.delete', function(e, chip){
-          $user_chip.material_chip({
-            data: $user_chip.material_chip('data')
-          });
-          addUserReviewerListener();
+          user_chip_data = $user_chip.material_chip('data').slice();
         });
         $group_chip.on('chip.delete', function(e, chip){
-          $group_chip.material_chip({
-            data: $group_chip.material_chip('data')
-          });
-          addUserReviewerListener();
+          group_chip_data = $group_chip.material_chip('data').slice();
         });
       
         /*
@@ -179,9 +179,6 @@
          * submitting the POST
          */
         $("#submit_review_form").submit(function(){
-          console.log(user_chip_data);
-          console.log(group_chip_data);
-          return false;
           // Create arrays of the user/group ids
           review_user_ids = [];
           for (var i=0; i<user_chip_data.length; ++i) {
