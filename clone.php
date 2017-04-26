@@ -4,13 +4,13 @@
 
 <html>
   <?php
-	$title = "Clone";
-	include("head.php"); 
-	?>
+  $title = "Clone";
+  include("head.php"); 
+  ?>
   
   <body>
   
-	<?php include("navbar.php"); ?>
+  <?php include("navbar.php"); ?>
 		
     <?php
       $hostname = "52.34.131.50";
@@ -53,16 +53,16 @@
                     "alert('Authentication failed.')",
                     "</script>";
             } else if ($exitCode == $SUCCESS) {
-				if (substr($cloneDir, -1) != "/")
-					$cloneDir .= "/";
-				$_SESSION['review_id'] = $dirName;
-                header("Location: http://".$hostname.":".$port."/".$onSuccessPhp);
-				exit();
+              if (substr($cloneDir, -1) != "/")
+                $cloneDir .= "/";
+              $_SESSION['review_id'] = $dirName;
+              header("Location: http://".$hostname.":".$port."/".$onSuccessPhp);
+              exit();
             } else {
-				echo "<script type='text/javascript'>",
-                    "alert('Error')",
-                    "</script>";
-			}
+              echo "<script type='text/javascript'>",
+                   "alert('Error')",
+                   "</script>";
+            }
         }
 
       }
@@ -90,13 +90,28 @@
     <!-- Repo input form -->
     <div class="valign container">
       <h3> Create a Review </h3>
-      <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+      <form id="create_review_form" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
           <label><b>Git Repository:</b></label>
 		  <input type="text" name="repo" value="<?php echo $repo;?>" autofocus="autofocus">
           <span class="error" style="color: red;"><?php echo $repoErr;?></span>
           <br></br>
           <input type="submit" name="form_repo_name" value="Create" class="waves-effect waves-light btn"/>
       </form>
+      
+      <div id="loader" class="center-align" style="display: none">
+      <div class="preloader-wrapper big active">
+        <div class="spinner-layer">
+          <div class="circle-clipper left">
+            <div class="circle"></div>
+          </div><div class="gap-patch">
+            <div class="circle"></div>
+          </div><div class="circle-clipper right">
+            <div class="circle"></div>
+          </div>
+        </div>
+      </div>
+      </div>
+      
     </div>
 
     <!-- authn modal -->
@@ -116,6 +131,14 @@
 		</div>
     </div>
 
+    <script>
+      // Before the form is submitted, show the loader
+      $("#create_review_form").submit(function() {
+        $("#loader").show();
+        return true;
+      })
+    </script>
+    
     <?php
         if (isset($_POST['form_repo_name'])) {
           if (isValidRepo($repo)) {

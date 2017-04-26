@@ -262,9 +262,13 @@ EOT;
     }
            
      $("#diff_submit").on("click", function(){
-        var postData = $("#get_diff").serializeArray();
-        requestDiffData(postData);
-        return false;    
+       // clear settings from previously viewed diffs
+       $('#resultDiv').html("");
+       $('#load_more_diff').show();
+       // request new diff data
+       var postData = $("#get_diff").serializeArray();
+       requestDiffData(postData);
+       return false;    
      });
      
      $("body").on("click", "#load_more_diff", function(){

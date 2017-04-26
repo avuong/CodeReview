@@ -33,7 +33,7 @@
     oci_close($conn);
   
     if ($_SERVER['REQUEST_URI'] === "/index.php" || $_SERVER['REQUEST_URI'] === "/" ) {
-      header("Location: clone.php");
+      header("Location: homepage.php");
       exit;
     }
   }

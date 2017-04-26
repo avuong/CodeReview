@@ -64,7 +64,7 @@
 	oci_execute($stmt);
     oci_close($conn);
     //header('Location: clone.php');//takes you to this page after running the script
-    echo "<script>top.window.location = './clone.php'</script>";
+    echo "<script>top.window.location = './homepage.php'</script>";
   }
 ?>
 

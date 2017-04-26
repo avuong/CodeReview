@@ -37,7 +37,7 @@
 	  oci_execute($stmt);
 	  oci_close($conn);
   
-      echo "<script>top.window.location = './clone.php'</script>";
+      echo "<script>top.window.location = './homepage.php'</script>";
   } else{
       print "<div style = 'color:red'>*LOGIN FAILED. Please check username/password combination</div>";
   }
