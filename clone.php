@@ -4,8 +4,8 @@
 
 <html>
   <?php
-  $title = "Clone";
-  include("head.php"); 
+    $title = "Clone";
+    include("head.php"); 
   ?>
   
   <body>
@@ -144,7 +144,7 @@
           if (isValidRepo($repo)) {
             $cmd = join(" ", array($cloneExec, $repo, $cloneDir, $dirName, $_SESSION['user_id']));
             $exitCode = shell_exec($cmd);
-			$exitCode = trim($exitCode);
+            $exitCode = trim($exitCode);
             #echo "<pre>~~~\n$exitCode\n~~~</pre>";
               
             if ($exitCode == $AUTHN) {
@@ -152,16 +152,16 @@
                     "document.getElementById('clone_pwd_modal').style.display='block'",
                     "</script>";
             } else if ($exitCode == $SUCCESS) {
-				if (substr($cloneDir, -1) != "/")
-					$cloneDir .= "/";
-				$_SESSION['review_id'] = $dirName;
-                header("Location: http://".$hostname.":".$port."/".$onSuccessPhp);
-				exit();
-			} else {
-				echo "<script type='text/javascript'>",
+              if (substr($cloneDir, -1) != "/")
+                $cloneDir .= "/";
+              $_SESSION['review_id'] = $dirName;
+              header("Location: http://".$hostname.":".$port."/".$onSuccessPhp);
+              exit();
+            } else {
+              echo "<script type='text/javascript'>",
                     "alert('Error')",
                     "</script>";
-			}
+            }
           }
         }
     ?>

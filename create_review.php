@@ -1,8 +1,20 @@
 <!DOCTYPE html>
 
-<?php require("authenticate_visitor.php"); ?>
+<?php 
+  $referrer = "/select_commits.php";
+  require("authenticate_visitor.php");
+?>
 
 <?php
+  // Ensure a POST request method
+  if ($_SERVER["REQUEST_METHOD"] != "POST") {
+    echo "request method error";
+    exit;
+  } else {
+    $_SESSION['diff1'] = $_POST['diff1'];
+    $_SESSION['diff2'] = $_POST['diff2'];
+  }
+  
   // get the user's username
   $conn = oci_connect("guest", "guest", "xe")
 	or die("<br>Couldn't connect");
@@ -30,12 +42,13 @@
   
 	<?php include("navbar.php"); ?>
 
+    <div class="container">
     <div class="row">
       <form id="submit_review_form" action="submit_review.php" method="POST" class="col s12">
         
         <div class="row">
           <div class="input-field col s3">
-            <input disabled value="<?php echo $user_name; ?>" id="owner" type="text" class="validate">
+            <input readonly value="<?php echo $user_name; ?>" id="owner"  name="owner" type="text" class="validate">
             <label for="owner">Owner</label>
           </div>
         </div>
@@ -81,6 +94,7 @@
         <input name="submit_review" type="submit" value="Submit" class="waves-effect waves-light btn" />
         
       </form>
+    </div>
     </div>
 
     <script>      

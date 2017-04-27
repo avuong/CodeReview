@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 
-<?php require("authenticate_visitor.php"); ?>
+<?php 
+  $referrer = "/clone.php";
+  require("authenticate_visitor.php");
+?>
 
 <html>
   <?php
@@ -64,7 +67,7 @@ EOT;
   
   <div id="mySidenav" class="sidenav container">
   <h5>Select two commits</h5>
-  <form name="get_diff" action="" id="get_diff" method="POST" onsubmit="return validateForm()">
+  <form name="get_diff" action="" id="get_diff" method="POST">
         <input placeholder="Commit #1" name="diff1" id="commit1" type="text" required readonly/>
         <input placeholder="Commit #2" name="diff2" id="commit2" type="text" required readonly/>
       <input name="diff_submit" id="diff_submit" type="button" value="Get Diff!" class="waves-effect waves-light btn" />
@@ -212,28 +215,32 @@ EOT;
 	  }
 	}
 
-  
-  function validateForm() {
-	var d1 = document.forms["get_diff"]["diff1"].value;
-	var d2 = document.forms["get_diff"]["diff2"].value;
-	var patt = /\s/;
-	valid1 = d1.length==40 && !patt.test(d1);
-	valid2 = d2.length==40 && !patt.test(d2);
-	if (!valid1) {
-		alert("Diff #1 is not valid");
-		return false;
-	} else if (!valid2) {
-		alert("Diff #2 is not valid");
-		return false;
-	} else {
-		return true;
-	}
-  }
-
   </script>
 
-    <script type="text/javascript">
+  <script type="text/javascript">
 
+    var diff1 = "";
+    var diff2 = "";
+    
+    function validateForm() {
+      var d1 = document.forms["get_diff"]["diff1"].value;
+      var d2 = document.forms["get_diff"]["diff2"].value;
+      var patt = /\s/;
+      valid1 = d1.length==40 && !patt.test(d1);
+      valid2 = d2.length==40 && !patt.test(d2);
+      if (!valid1) {
+        alert("Diff #1 is not valid");
+        return false;
+      } else if (!valid2) {
+        alert("Diff #2 is not valid");
+        return false;
+      } else {
+        diff1 = d1;
+        diff2 = d2;
+        return true;
+      }
+    }
+      
     var last_line = -1;
     
     function requestDiffData(postData) {
@@ -262,13 +269,16 @@ EOT;
     }
            
      $("#diff_submit").on("click", function(){
+       if (!validateForm()) {
+         return;
+       }
        // clear settings from previously viewed diffs
        $('#resultDiv').html("");
        $('#load_more_diff').show();
        // request new diff data
        var postData = $("#get_diff").serializeArray();
        requestDiffData(postData);
-       return false;    
+       return true;    
      });
      
      $("body").on("click", "#load_more_diff", function(){
@@ -300,9 +310,21 @@ EOT;
       </div>
     </div>
     <div class="modal-footer">
-      <a href="./create_review.php" class="modal-action modal-close waves-effect waves-green btn-flat ">Submit</a>
+      <a id="submit_diff_btn" class="modal-action modal-close waves-effect waves-green btn-flat ">Submit</a>
     </div>
   </div>
 
+  <script>
+    $("#submit_diff_btn").on("click", function() {
+      var url = 'create_review.php';
+      var form = $('<form action="' + url + '" method="post">' +
+        '<input type="text" name="diff1" value="' + diff1 + '" />' +
+        '<input type="text" name="diff2" value="' + diff2 + '" />' +
+        '</form>');
+      $('body').append(form);
+      form.submit();
+    });
+  </script>
+  
 </body>
 </html>

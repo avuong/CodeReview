@@ -31,5 +31,5 @@ if [ $ret -ne 0 ]; then
 fi
 
 # Load commit metadata into SQLPlus
-/home/ec2-user/apache/htdocs/shell_scripts/sql_load_commits.sh $local_repo $repo_name $sql_userid > /dev/null
+#/home/ec2-user/apache/htdocs/shell_scripts/sql_load_commits.sh $local_repo $repo_name $sql_userid > /dev/null
 quit $?
