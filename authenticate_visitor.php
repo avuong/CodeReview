@@ -19,6 +19,7 @@
   oci_bind_by_name($stmt,':session_useragent', $_SERVER['HTTP_USER_AGENT']);
   oci_execute($stmt);
   oci_fetch($stmt);
+  oci_close($conn);
   
   // if the user does not have a valid session...
   if(empty($session_id)) {

@@ -142,7 +142,7 @@
     <?php
         if (isset($_POST['form_repo_name'])) {
           if (isValidRepo($repo)) {
-            $cmd = join(" ", array($cloneExec, $repo, $cloneDir, $dirName, $_SESSION['user_id']));
+            $cmd = join(" ", array($cloneExec, $repo, $cloneDir, $dirName, $user_id));
             $exitCode = shell_exec($cmd);
             $exitCode = trim($exitCode);
             #echo "<pre>~~~\n$exitCode\n~~~</pre>";

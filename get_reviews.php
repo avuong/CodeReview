@@ -15,15 +15,15 @@
   while($row=oci_fetch_array($array)){
     //echo $row[0]." ".$row[1];
     echo "<tr><td>"; 
-    echo $row['ID'];
+    echo "<a href='/review.php?id=".$row['ID']."'>".$row['ID']."</a>";
     echo "</td><td>";   
-    echo $row['Summary'];
+    echo $row['SUMMARY'];
     echo "</td><td>";    
-    echo $row['Description'];
+    echo $row['DESCRIPTION'];
     echo "</td><td>";    
-    echo $row['Timestamp'];
+    echo $row['TIMESTAMP'];
     echo "</td><td>";    
-    echo $row['Owner'];
+    echo $row['OWNER'];
     echo "</td></tr>"; 
   }
 
