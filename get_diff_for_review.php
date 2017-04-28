@@ -70,6 +70,35 @@
     }
   }
   
+  function get_tooltip_message($diff_lines, $change) {
+    $a_regex = '~^\+[^\+]~';
+    $add_count = count(preg_grep($a_regex, $diff_lines));
+    if ($add_count == 0) {
+      $a_tooltip = "Binary file added";
+    } else if ($add_count == 1) {
+      $a_tooltip = "1 addition";
+    } else {
+      $a_tooltip = "$add_count additions";
+    }
+    if ($change == "a")
+      return $a_tooltip;
+    
+    $d_regex = '~^-[^\-]~';
+    $del_count = count(preg_grep($d_regex, $diff_lines));
+    if ($del_count == 0) {
+      $d_tooltip = "Binary file deleted";
+    } else if ($del_count == 1) {
+      $d_tooltip = "1 deletion";
+    } else {
+      $d_tooltip = "$del_count deletions";
+    }
+    if ($change == "d")
+      return $d_tooltip;
+    
+    // else its "m"
+    return $a_tooltip." & ".$d_tooltip;
+  }
+  
   // determine where the diff is for an addition, modification, or deletion
   function get_file_status($diff_lines, &$pre_file, &$post_file) {
     $regex = '~^index\s[a-f0-9]{7}\.\.[a-f0-9]{7}~';
@@ -83,14 +112,20 @@
         if ($pre_file == $nil || $post_file == $nil) {
           if ($pre_file == $nil) {
             // added file;
-            return "<i class=\"material-icons md-24 md-green400 icon-valign\">add_circle</i>";
+            $msg = get_tooltip_message($diff_lines, "a");
+            return "<a class=\"tooltipped\" data-position=\"left\" data-delay=\"50\" data-tooltip=\"$msg\">\
+            <i class=\"material-icons md-24 md-green400 icon-valign\">add_circle</i></a>";
           } else {
             // deleted file
-            return "<i class=\"material-icons md-24 md-red300 icon-valign\">remove_circle</i>";
+            $msg = get_tooltip_message($diff_lines, "d");
+            return "<a class=\"tooltipped\" data-position=\"left\" data-delay=\"50\" data-tooltip=\"$msg\">\
+            <i class=\"material-icons md-24 md-red300 icon-valign\">remove_circle</i></a>";
           }
         } else {
           // modified file
-          return "<i class=\"material-icons md-24 md-amber400 icon-valign\">add_circle</i>";
+          $msg = get_tooltip_message($diff_lines, "m");
+          return "<a class=\"tooltipped\" data-position=\"left\" data-delay=\"50\" data-tooltip=\"$msg\">\
+          <i class=\"material-icons md-24 md-amber400 icon-valign\">add_circle</i></a>";
         }
       }
     }
@@ -232,6 +267,9 @@
                         belowOrigin: false, // Displays dropdown below the button
                         alignment: 'left', // Displays dropdown with edge aligned to the left of button
                         stopPropagation: false // Stops event propagation
+                      });
+                      $(document).ready(function(){
+                        $('.tooltipped').tooltip({delay: 50});
                       });";
                           
     // return output
