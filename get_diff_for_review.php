@@ -140,7 +140,7 @@
     $output = "var dropdown_div = $('<div class=\"valign-wrapper\" style=\"margin: 0 0 0 auto;\"></div>');
               var dropdown_html = '<a class=\"dropdown-button btn\" href=\"#\" data-activates=\"dropdown-$diff_counter\">View</a><ul id=\"dropdown-$diff_counter\" class=\"dropdown-content\">$li1$li2</ul>';
               var dropdown = $(dropdown_html);
-              var toggle_btn = '<i class=\"material-icons toggle-btn\" style=\"cursor: pointer;\">keyboard_arrow_down</i>';
+              var toggle_btn = '<i class=\"material-icons toggle-btn\">keyboard_arrow_down</i>';
               dropdown_div.append(dropdown).append(toggle_btn);";
      return $output;
   }
@@ -280,7 +280,6 @@
                         code_div.show(500);
                         $(this).text('keyboard_arrow_down');
                       }
-                      //$(this).css('transform', 'rotate(180deg)');
                     });";
                           
     // return output
