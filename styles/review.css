@@ -1,3 +1,8 @@
+/*
+teal lighten-5: #E0F2F1
+blue-grey lighten-5: #ECEFF1
+*/
+
 #review_title_div {
   margin-top: 25px;
 }
@@ -9,4 +14,25 @@
 
 .tabs {
   margin-bottom: 20px;
+}
+
+.file_div {
+  border-radius: 2px;
+  border-width: 1px;
+  border-color: #ECEFF1;
+  border-style: solid;
+  margin: 20px 0px;
+}
+
+.file_header_div {
+  background-color: #ECEFF1;
+  padding: 5px;
+}
+
+.file_header_div > h6 {
+  margin: 0px;
+}
+
+.file_code_div {
+  padding: 5px;
 }

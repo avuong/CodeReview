@@ -29,10 +29,7 @@
 
   oci_close($conn);
 
-         
-//TEST 
-//INSERT INTO Reviews (ID, SUMMARY, DESCRIPTION, TIMESTAMP, OWNER)
-//VALUES ('1', 'Code Review', 'Integrating git hooks', TO_DATE('2003/07/09', 'yyyy/mm/dd'), 'avuong');
+
 
 ?>
 

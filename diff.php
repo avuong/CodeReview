@@ -3,12 +3,15 @@
 	$review_id = $_SESSION['review_id'];
 	
   // Generate diff
-	$diff1 = $_POST['diff1'];
-	$diff2 = $_POST['diff2'];
+  $diff1 = $_POST['diff1'];
+  $diff2 = $_POST['diff2'];
 	
-	$cmd = "cd /tmp/git_clone/$review_id && git diff $diff1 $diff2";	
-	$output = shell_exec($cmd);
-	$output = htmlspecialchars($output);
+  #run script that will correctly order the two diffs for git diff based on
+  #ancestor - descendent relationship
+  $cmd = "./commit_order.sh $review_id $diff1 $diff2";
+  $output = shell_exec($cmd);
+  $output = htmlspecialchars($output);
+  //$cmd = "cd /tmp/git_clone/$review_id && git diff $diff1 $diff2";	
 
   $diff_lines = explode("\n", $output);
     

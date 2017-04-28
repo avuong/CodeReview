@@ -76,144 +76,147 @@ EOT;
   <canvas id="gitGraph"></canvas>
 
   <script>
-	/*
-	 * Generate a GitGraph representation of the git repo
-	 */
-	 // Git commits store the parent commits, but not the children commits.
-	 // Loop through all commits and build a dict that keeps track of
-	 // children commits.
-	var commitTree = <?php echo $commit_tree; ?>;
-	console.log(commitTree);
-	children = {};
-	for (var i=0; i<commitTree.length; ++i) {
-	  var commit = commitTree[i].commit;
-	  var parent = commitTree[i].parent;
-	  children[parent] = children[parent] || [];
-	  children[parent].push(commit);
-	}
-	console.log(children);
+  /*
+   * Generate a GitGraph representation of the git repo
+   */
+  // Git commits store the parent commits, but not the children commits.
+  // Loop through all commits and build a dict that keeps track of
+  // children commits.
+  var commitTree = <?php echo $commit_tree; ?>;
+  console.log(commitTree);
+  children = {};
+  for (var i=0; i<commitTree.length; ++i) {
+    var commit = commitTree[i].commit;
+    var parent = commitTree[i].parent;
+    children[parent] = children[parent] || [];
+    children[parent].push(commit);
+  }
+  console.log(children);
 	
-	// Create the GitGraph object and set template properties
-	var gitgraph = new GitGraph({
-		template: "metro",
-		orientation: "vertical-reverse",
-		mode: "extended"
-	});
-	gitgraph.template.commit.message.displayBranch = false;
-	gitgraph.template.commit.dot.strokeColor = "#FFD600";
-	gitgraph.canvas.addEventListener("commit:mouseover", function (event) {
-		this.style.cursor = "pointer";
-	});
-	gitgraph.canvas.addEventListener("commit:mouseout", function (event) {
-		this.style.cursor = "auto";
-	});
-	console.log(gitgraph);
-	var master = gitgraph.branch("master");
+  // Create the GitGraph object and set template properties
+  var gitgraph = new GitGraph({
+    template: "metro",
+    orientation: "vertical-reverse",
+    mode: "extended"
+  });
+  gitgraph.template.commit.message.displayBranch = false;
+  gitgraph.template.commit.dot.strokeColor = "#FFD600";
+  gitgraph.canvas.addEventListener("commit:mouseover", function (event) {
+    this.style.cursor = "pointer";
+  });
+  gitgraph.canvas.addEventListener("commit:mouseout", function (event) {
+    this.style.cursor = "auto";
+  });
+  console.log(gitgraph);
+  var master = gitgraph.branch("master");
 
-	// Data structures used to keep track of branching and merging
-	var visited = {};
-	var map_head = {};
-	map_head[""] = master;
+  // Data structures used to keep track of branching and merging
+  var visited = {};
+  var map_head = {};
+  map_head[""] = master;
 	
-	// Called when a commit node is clicked on
-	function clicked(obj) {
-		console.log(obj);
-		var c1 = document.getElementById("commit1");
-		var c2 = document.getElementById("commit2");
+  // Called when a commit node is clicked on
+  function clicked(obj) {
+    console.log(obj);
+    var c1 = document.getElementById("commit1");
+    var c2 = document.getElementById("commit2");
 		
-		if (!obj.representedObject.selected) {
+    if (!obj.representedObject.selected) {
 
-			if (c1.value && c2.value) {
-				alert("There are already two commits selected.");
-			} else if (c1.value) {
-				c2.value = obj.representedObject.commit;
-				obj.tag = "Commit #2";
-				obj.representedObject.selected = true;
-				obj.dotStrokeWidth = 20;
-			} else {
-				c1.value = obj.representedObject.commit;
-				obj.tag = "Commit #1";
-				obj.representedObject.selected = true;
-				obj.dotStrokeWidth = 20;
-			}
-		} else {
-			obj.representedObject.selected = false;
-			obj.dotStrokeWidth = null;
-			if (obj.tag === "Commit #1")
-				c1.value = "";
-			else
-				c2.value = "";
-			obj.tag = null;
-		}
-		gitgraph.render();
-	}
+      if (c1.value && c2.value) {
+        alert("There are already two commits selected.");
+      } else if (c1.value) {
+        c2.value = obj.representedObject.commit;
+        obj.tag = "Commit #2";
+        obj.representedObject.selected = true;
+        obj.dotStrokeWidth = 20;
+      } else {
+        c1.value = obj.representedObject.commit;
+        obj.tag = "Commit #1";
+        obj.representedObject.selected = true;
+        obj.dotStrokeWidth = 20;
+      }
+    } else {
+      obj.representedObject.selected = false;
+      obj.dotStrokeWidth = null;
+      if (obj.tag === "Commit #1")
+        c1.value = "";
+      else
+        c2.value = "";
+      obj.tag = null;
+    }
+    gitgraph.render();
+  }
 	
-	// determines if the child branch is a descendent of the parent branch
-	function isChildOf(child, parent) {
-		var curr = child;
-		while (curr.parentBranch) {
-			if (curr.parentBranch === parent) 
-				return true;
-			curr = curr.parentBranch;
-		}
-		return false;
-	}
+  // determines if the child branch is a descendent of the parent branch
+  function isChildOf(child, parent) {
+    var curr = child;
+    while (curr.parentBranch) {
+      if (curr.parentBranch === parent) 
+        return true;
+      curr = curr.parentBranch;
+    }
+    return false;
+  }
 	
 	// Loop through all commits and populate the GitGraph
-	for (var i=0; i<commitTree.length; ++i) {
-	  var parent = commitTree[i].parent;
-	  var commit = commitTree[i].commit;
+  for (var i=0; i<commitTree.length; ++i) {
+    var parent = commitTree[i].parent;
+    var commit = commitTree[i].commit;
 	  
-	  var message = commitTree[i].subject;
-	  var author = commitTree[i].author.email;
-	  var sha1 = commitTree[i].abbreviated_commit;
-	  var commitMessage = {
-		  message: message, 
-		  author: author, 
-		  sha1: sha1,
-		  showLabel: true,
-		  representedObject: { // https://github.com/nicoespeon/gitgraph.js/blob/develop/src/gitgraph.js#L659
-			  commit: commit,
-			  selected: false
-		  },
-		  onClick: function(){
-//			  clicked(this.representedObject);
-			  clicked(this);
-		  }
-	  };
+    var message = commitTree[i].subject;
+    var author = commitTree[i].author.email;
+    var sha1 = commitTree[i].abbreviated_commit;
+    var commitMessage = {
+      message: message, 
+      author: author, 
+      sha1: sha1,
+      showLabel: true,
+      representedObject: { // https://github.com/nicoespeon/gitgraph.js/blob/develop/src/gitgraph.js#L659
+        commit: commit,
+        selected: false
+      },
+      onClick: function(){
+//	    clicked(this.representedObject);
+        clicked(this);
+      }
+    };
 	  /*
 	  console.log(commitTree[i]);
 	  console.log(commit);
 	  console.log(parent);
 	  */
-	  if (children[parent].length > 1 && !visited[parent]) {
-		// First child found where a branch was created
-		// - branch, then commit
-		var new_branch = map_head[parent].branch({name: sha1});
-		map_head[commit] = new_branch;
-		map_head[commit].commit(commitMessage);
-		visited[parent] = true;
-	  } else if (children[parent].length > 1) {
-		// Second (or higher) child found where a branch was created
-			// - just commit
-		map_head[parent].commit(commitMessage);
-		map_head[commit] = map_head[parent];
-	  } else if (parent.split(" ").length > 1) {
-		// Merge commit
-		var [b1, b2] = parent.split(" ");
-		if (isChildOf(map_head[b1], map_head[b2])) {
-			map_head[b1].merge(map_head[b2], commitMessage);
-			map_head[commit] = map_head[b2];
-		} else {
-			map_head[b2].merge(map_head[b1], commitMessage);
-			map_head[commit] = map_head[b1];
-		}
-	  } else {
-		// Standard commit
-		map_head[parent].commit(commitMessage);
-		map_head[commit] = map_head[parent];
-	  }
-	}
+    console.log(commit);
+    console.log(parent);
+    console.log(map_head);
+    if (children[parent].length > 1 && !visited[parent]) {
+      // First child found where a branch was created
+      // - branch, then commit
+      var new_branch = map_head[parent].branch({name: sha1});
+      map_head[commit] = new_branch;
+      map_head[commit].commit(commitMessage);
+      visited[parent] = true;
+    } else if (children[parent].length > 1) {
+      // Second (or higher) child found where a branch was created
+        // - just commit
+      map_head[parent].commit(commitMessage);
+      map_head[commit] = map_head[parent];
+    } else if (parent.split(" ").length > 1) {
+      // Merge commit
+      var [b1, b2] = parent.split(" ");
+      if (isChildOf(map_head[b1], map_head[b2])) {
+        map_head[b1].merge(map_head[b2], commitMessage);
+        map_head[commit] = map_head[b2];
+      } else {
+        map_head[b2].merge(map_head[b1], commitMessage);
+        map_head[commit] = map_head[b1];
+      }
+    } else {
+      // Standard commit
+      map_head[parent].commit(commitMessage);
+      map_head[commit] = map_head[parent];
+    }
+  }
 
   </script>
 

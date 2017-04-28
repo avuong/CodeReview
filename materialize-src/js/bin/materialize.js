@@ -4115,7 +4115,7 @@ if (jQuery) {
     $(document).on('click', '.chip .close', function(e){
       var $chips = $(this).closest('.chips');
       if ($chips.attr('data-initialized')) {
-        return;
+//        return;
       }
       $(this).closest('.chip').remove();
     });

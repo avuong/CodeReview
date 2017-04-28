@@ -69,6 +69,21 @@
       return $from_file;
     }
   }
+  
+  // determine where the diff is for an addition, modification, or deletion
+  function get_file_status($diff_lines) {
+    $regex = '~^index\s[a-f0-9]{7}\.\.[a-f0-9]{7}$~';
+    foreach ($diff_lines as $line) {
+      if (preg_match($regex, $line)) {
+        $regex = '~[a-f0-9]{7}~';
+        preg_match_all($regex, $line, $matches);
+        //print_r($matches);
+        //exit;
+        return $line;
+      }
+    }
+    return "eof";
+  }
    
   // loop through array of lines in a diff and build up a string of formatted <p>s
   function diff_lines_to_paragraphs($diff_lines) {
@@ -92,7 +107,7 @@
   // Given a diff file, format it nicely using html, then return the string
   function diff_to_html_string($file_diff, $max_diff_size, &$start_line_idx, &$end_line_idx) {
     $diff_str = "var file_div = $(\"<div class='file_div'></div>\");
-                    var code_div = $(\"<div class='code_div'></div>\");";
+                    var code_div = $(\"<div class='file_code_div'></div>\");";
       
     // divide file diff into array of lines
     $diff_lines = explode("\n", $file_diff);
@@ -100,17 +115,23 @@
     // keep track of global line numbers in the diff file
     $start_line_idx = $end_line_idx;
     $end_line_idx += count($diff_lines);
-    // retrieve and print filename
+    
+    // handle git diff header
     $file_name = get_file_name($diff_lines[0]);
-    $diff_str .= "var header = $('<h4>$file_name</h4>');
-                    file_div.append(header);";
+    $status = get_file_status($diff_lines);
+    $diff_str .= "var header_div = $('<div class=\"file_header_div\"></div>');
+                  var header = $('<h6>$status $file_name</h6>');
+                  header_div.append(header);
+                  file_div.append(header_div);";
     
     // If the diff is too big, just print a button instead of the diff
     if (strlen($file_diff) > $max_diff_size) {
-      $diff_str .= "var load_diff_btn = $(\"<a class='waves-effect waves-light btn load_diff'>Load diff</a>\");";
+      $diff_str .= "var a_container = $('<div class=\"left-align\"></div>');
+                    var load_diff_btn = $(\"<a class='waves-effect waves-light btn load_diff'>Load diff</a>\");
+                    a_container.append(load_diff_btn);";
       $js_obj = "{'start_line': $start_line_idx, 'end_line': $end_line_idx-1}";
-      $diff_str .= "load_diff_btn.data($js_obj);";
-      $diff_str .= "code_div.append(load_diff_btn);";
+      $diff_str .= "load_diff_btn.data($js_obj);
+                    code_div.append(a_container);";
     
     } else {    
       // loop through lines in the current diff
