@@ -20,7 +20,7 @@ include("navbar.php");
     </li>
     <li class="collection-item">
       Apparently the order you choose commits in matters. We should always put the earlier commit before
-      the later one.
+      the later one. Update: Fixed 
     </li>
     <li class="collection-item">
       <a href="https://github.com/pdrumm/SpaceGame/commit/d9c9586726bb3378703a670545e9892c0dd14034">This</a>

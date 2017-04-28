@@ -16,21 +16,18 @@
     <!-- AJAX -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gitgraph.js/1.10.0/gitgraph.js"></script>
 
+    <!-- TOGGLE -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/css-toggle-switch/latest/toggle-switch.css" />
+
   </head>
 
-  <body>
+  <body onload="get_incoming_reviews();" style="background-color:#BFEFFF">
 
      <?php include("navbar.php"); ?>
 
-     <div id="sidebar">
-     <ul id="slide-out" style="position: relative; padding-top: 3em;" class="side-nav fixed">
-      <li><a onclick='get_reviews();'>Incoming Reviews</a></li>
-      <li><a href="#!">Outgoing Reviews</a></li>
-    </ul>
-    </div> 
 
    <script>
-     function get_reviews(){
+     function get_incoming_reviews(){
        console.log("hello");
          var request = $.ajax({
           url: "./get_reviews.php",
@@ -46,7 +43,22 @@
         
         return false;    
      }
+     function get_outgoing_reviews(){
+        $('#resultDiv').html("Display Outgoing reviews here")
+     }
    </script>
+   
+
+  <div class="switch-toggle switch-candy">
+    <input id="incoming" name="view" type="radio" checked>
+    <label for="incoming" onclick="get_incoming_reviews();">Incoming Reviews</label>
+
+    <input id="outgoing" name="view" type="radio">
+    <label for="outgoing" onclick="get_outgoing_reviews();">Outgoing Reviews</label>
+
+    <a></a>
+  </div>
+
 
    <div id=resultDiv style="position: relative; left:50px"></div>
  </body>

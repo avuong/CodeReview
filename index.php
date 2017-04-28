@@ -8,7 +8,7 @@
     include("head.php"); 
   ?>
   
-  <body>
+  <body style="background-color:#BFEFFF">
     
   <div class="valign-wrapper">
     <div class="valign container">
@@ -24,7 +24,7 @@
         <input name="mySubmit" type="submit" value="Log In!" class="waves-effect waves-light btn" />
       </form>
       
-      <iframe name="myIframe" frameborder="0" border="0" cellspacing="0" style="border-style: none;width: 100%; height: 30px;"></iframe>
+      <iframe name="myIframe" frameborder="0" border="0" cellspacing="0" style="border-style: none;width: 100%; height: 30px;" scrolling="no"></iframe>
 
       <p>Don't have an account? </p>
       <a href="./signup.html"> Sign up here </a>

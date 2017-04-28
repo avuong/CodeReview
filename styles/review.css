@@ -30,8 +30,37 @@ blue-grey lighten-5: #ECEFF1
 }
 
 .file_header_div > h6 {
-  margin: 0px;
+  margin: 0px 0px 0px 10px;
 }
+
+/* Rules for all icons */
+i.icon-valign {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+}
+
+/* Rules for sizing the icon. */
+i.md-18 { font-size: 18px; }
+i.md-24 { font-size: 24px; }
+i.md-36 { font-size: 36px; }
+
+/* Rules for using icons as black on a light background. */
+i.md-green { color: #dbffdb; }
+i.md-green200 { color: #a5d6a7; }
+i.md-green300 { color: #81c784; }
+i.md-green400 { color: #66bb6a; }
+i.md-lime200 { color: #e6ee9c; }
+i.md-lime300 { color: #dce775; }
+i.md-lime400 { color: #d4e157; }
+i.md-amber200 { color: #ffe082; }
+i.md-amber300 { color: #ffd54f; }
+i.md-amber400 { color: #ffca28; }
+i.md-red { color: #f1c0c0; }
+i.md-red200 { color: #ef9a9a; }
+i.md-red300 { color: #e57373; }
+i.md-red300 { color: #ef5350; }
 
 .file_code_div {
   padding: 5px;

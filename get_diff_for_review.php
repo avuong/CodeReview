@@ -71,18 +71,40 @@
   }
   
   // determine where the diff is for an addition, modification, or deletion
-  function get_file_status($diff_lines) {
-    $regex = '~^index\s[a-f0-9]{7}\.\.[a-f0-9]{7}$~';
+  function get_file_status($diff_lines, &$pre_file, &$post_file) {
+    $regex = '~^index\s[a-f0-9]{7}\.\.[a-f0-9]{7}~';
     foreach ($diff_lines as $line) {
       if (preg_match($regex, $line)) {
         $regex = '~[a-f0-9]{7}~';
         preg_match_all($regex, $line, $matches);
-        //print_r($matches);
-        //exit;
-        return $line;
+        $pre_file = $matches[0][0];
+        $post_file = $matches[0][1];
+        $nil = "0000000";
+        if ($pre_file == $nil || $post_file == $nil) {
+          if ($pre_file == $nil) {
+            // added file;
+            return "<i class=\"material-icons md-18 md-green400 icon-valign\">add_circle</i>";
+          } else {
+            // deleted file
+            return "<i class=\"material-icons md-18 md-red300 icon-valign\">remove_circle</i>";
+          }
+        } else {
+          // modified file
+          return "<i class=\"material-icons md-18 md-amber400 icon-valign\">add_circle</i>";
+        }
       }
     }
-    return "eof";
+    return "";
+  }
+  
+  // use the first few lines of the diff to create an html header
+  function create_header_div($diff_lines, &$idx) {
+    $file_name = get_file_name($diff_lines[0]);
+    $status = get_file_status($diff_lines, $pre_file, $post_file);
+    $header_div = "var header_div = $('<div class=\"file_header_div valign-wrapper\"></div>');
+                  var header = $('$status<h6>$file_name</h6>');
+                  header_div.append(header);";
+    return $header_div;
   }
    
   // loop through array of lines in a diff and build up a string of formatted <p>s
@@ -117,12 +139,8 @@
     $end_line_idx += count($diff_lines);
     
     // handle git diff header
-    $file_name = get_file_name($diff_lines[0]);
-    $status = get_file_status($diff_lines);
-    $diff_str .= "var header_div = $('<div class=\"file_header_div\"></div>');
-                  var header = $('<h6>$status $file_name</h6>');
-                  header_div.append(header);
-                  file_div.append(header_div);";
+    $header_div = create_header_div($diff_lines, $idx);
+    $diff_str .= $header_div."file_div.append(header_div);";
     
     // If the diff is too big, just print a button instead of the diff
     if (strlen($file_diff) > $max_diff_size) {

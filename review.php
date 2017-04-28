@@ -35,6 +35,7 @@
     $title = "Review";
     $include = "
       <link rel='stylesheet' href='styles/review.css'>
+      <link href=\"https://fonts.googleapis.com/icon?family=Material+Icons\" rel=\"stylesheet\">
     ";
     include("head.php"); 
 	?>
