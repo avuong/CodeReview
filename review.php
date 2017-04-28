@@ -84,8 +84,7 @@
           </div>
         </div>
         
-        <div id="diff_div" class="col s12">
-        </div>
+        <div id="diff_div" class="col s12"></div>
         
       </div>
     </div>

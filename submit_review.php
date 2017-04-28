@@ -80,7 +80,7 @@
   // Close connection
   oci_close($conn);
   
-  // Redirect to homepage
-  header("Location: homepage.php");
+  // Redirect to created review
+  header("Location: review.php?id=".$review_id);
   exit();
 ?>
