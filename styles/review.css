@@ -12,6 +12,12 @@ blue-grey lighten-5: #ECEFF1
   background-color: #ECEFF1;
 }
 
+.tab {
+  #border-radius: 10px 10px 0 0;
+  #border: 1px solid #ECEFF1;
+  #border-bottom: none;
+}
+
 .tabs {
   margin-bottom: 20px;
 }
@@ -19,9 +25,9 @@ blue-grey lighten-5: #ECEFF1
 .file_div {
   border-radius: 2px;
   border-width: 1px;
-  border-color: #ECEFF1;
+  border-color: #cfd8dc;
   border-style: solid;
-  margin: 20px 0px;
+  margin: 30px 0px;
 }
 
 .file_header_div {
@@ -31,6 +37,8 @@ blue-grey lighten-5: #ECEFF1
 
 .file_header_div > h6 {
   margin: 0px 0px 0px 10px;
+  font-size: 18px;
+  color: #546e7a;
 }
 
 /* Rules for all icons */
@@ -61,6 +69,11 @@ i.md-red { color: #f1c0c0; }
 i.md-red200 { color: #ef9a9a; }
 i.md-red300 { color: #e57373; }
 i.md-red300 { color: #ef5350; }
+
+.dropdown-button {
+  color: #607d8b;
+  background-color: #cfd8dc;
+}
 
 .file_code_div {
   padding: 5px;

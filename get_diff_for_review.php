@@ -83,27 +83,45 @@
         if ($pre_file == $nil || $post_file == $nil) {
           if ($pre_file == $nil) {
             // added file;
-            return "<i class=\"material-icons md-18 md-green400 icon-valign\">add_circle</i>";
+            return "<i class=\"material-icons md-24 md-green400 icon-valign\">add_circle</i>";
           } else {
             // deleted file
-            return "<i class=\"material-icons md-18 md-red300 icon-valign\">remove_circle</i>";
+            return "<i class=\"material-icons md-24 md-red300 icon-valign\">remove_circle</i>";
           }
         } else {
           // modified file
-          return "<i class=\"material-icons md-18 md-amber400 icon-valign\">add_circle</i>";
+          return "<i class=\"material-icons md-24 md-amber400 icon-valign\">add_circle</i>";
         }
       }
     }
     return "";
   }
   
+  function get_dropdown($pre_file, $post_file, $diff_counter) {
+    $nil = "0000000";
+    $li1 = $pre_file == $nil ? "" : '<li><a href="get_file_version.php?review_id='.$_GET['review_id'].'&file_idx='.$pre_file.'">Before</a></li>';
+    $li2 = $post_file == $nil ? "" : '<li><a href="get_file_version.php?review_id='.$_GET['review_id'].'&file_idx='.$post_file.'">After</a></li>';
+    
+    return '<!-- Dropdown Trigger -->\
+            <div class="right-align" style="margin: 0 0 0 auto;">\
+              <a class="dropdown-button btn" href="#" data-activates="dropdown-'.$diff_counter.'">View</a>\
+              <!-- Dropdown Structure -->\
+              <ul id="dropdown-'.$diff_counter.'" class="dropdown-content">\
+                '.$li1.$li2.'\
+              </ul>\
+            </div>\
+            ';
+  }
+  
   // use the first few lines of the diff to create an html header
-  function create_header_div($diff_lines, &$idx) {
+  function create_header_div($diff_lines, &$idx, $diff_counter) {
     $file_name = get_file_name($diff_lines[0]);
     $status = get_file_status($diff_lines, $pre_file, $post_file);
+    $dropdown = get_dropdown($pre_file, $post_file, $diff_counter);
     $header_div = "var header_div = $('<div class=\"file_header_div valign-wrapper\"></div>');
-                  var header = $('$status<h6>$file_name</h6>');
-                  header_div.append(header);";
+                  var file_name = $('$status<h6>$file_name</h6>');
+                  var dropdown = $('$dropdown');
+                  header_div.append(file_name).append(dropdown);";
     return $header_div;
   }
    
@@ -127,8 +145,8 @@
   }
  
   // Given a diff file, format it nicely using html, then return the string
-  function diff_to_html_string($file_diff, $max_diff_size, &$start_line_idx, &$end_line_idx) {
-    $diff_str = "var file_div = $(\"<div class='file_div'></div>\");
+  function diff_to_html_string($file_diff, $max_diff_size, &$start_line_idx, &$end_line_idx, $diff_counter) {
+    $diff_str = "var file_div = $(\"<div class='file_div z-depth-1'></div>\");
                     var code_div = $(\"<div class='file_code_div'></div>\");";
       
     // divide file diff into array of lines
@@ -139,7 +157,7 @@
     $end_line_idx += count($diff_lines);
     
     // handle git diff header
-    $header_div = create_header_div($diff_lines, $idx);
+    $header_div = create_header_div($diff_lines, $idx, $diff_counter);
     $diff_str .= $header_div."file_div.append(header_div);";
     
     // If the diff is too big, just print a button instead of the diff
@@ -170,38 +188,51 @@
     $max_diff_size = 1000;  // bytes
     $start_line_idx = 1;
     $end_line_idx = 1;
+    $diff_counter = 0;
     
     foreach ($diffs_by_file as $file_diff) {
-      $php_output .= diff_to_html_string($file_diff, $max_diff_size, $start_line_idx, $end_line_idx);
-      
+      $php_output .= diff_to_html_string($file_diff, $max_diff_size, $start_line_idx, $end_line_idx, $diff_counter);
+      ++$diff_counter;
     }
     
     // Add a listener to the "load diff" buttons that calls this script to retrieve single diff
     $php_output .= '
-                          $(".load_diff").on("click", function() {
-                          
-                            var self = this;
-                            var request = $.ajax({
-                              url: "./get_diff_for_review.php",
-                              type: "GET",
-                              data: {
-                                review_id: "'.$_GET['review_id'].'",
-                                start_line: $(this).data("start_line"),
-                                end_line: $(this).data("end_line")
-                              }
-                            });
-                            
-                            request.success(function(data) {
-                              $(self).parent().html(data);
-                            });
-                            
-                            request.fail(function(jqXHR, textStatus) {
-                              alert( "Request failed: " + textStatus );
-                            });
-                            
-                            return false;
-                          });
-                          ';
+        $(".load_diff").on("click", function() {
+        
+          var self = this;
+          var request = $.ajax({
+            url: "./get_diff_for_review.php",
+            type: "GET",
+            data: {
+              review_id: "'.$_GET['review_id'].'",
+              start_line: $(this).data("start_line"),
+              end_line: $(this).data("end_line")
+            }
+          });
+          
+          request.success(function(data) {
+            $(self).parent().html(data);
+          });
+          
+          request.fail(function(jqXHR, textStatus) {
+            alert( "Request failed: " + textStatus );
+          });
+          
+          return false;
+        });
+        ';
+        
+    // initialize all dropdown menus
+    $php_output .= "$('.dropdown-button').dropdown({
+                        inDuration: 300,
+                        outDuration: 225,
+                        constrainWidth: true, // change width of dropdown to that of the activator
+                        hover: true, // Activate on hover
+                        gutter: 0, // Spacing from edge
+                        belowOrigin: false, // Displays dropdown below the button
+                        alignment: 'left', // Displays dropdown with edge aligned to the left of button
+                        stopPropagation: false // Stops event propagation
+                      });";
                           
     // return output
     return "<script>$php_output</script>";
