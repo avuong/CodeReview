@@ -28,9 +28,8 @@
 
    <script>
      function get_incoming_reviews(){
-       console.log("hello");
-         var request = $.ajax({
-          url: "./get_reviews.php",
+        var request = $.ajax({
+          url: "./get_incoming_reviews.php",
           type: "POST",
           success: function(data){
             $('#resultDiv').html(data);
@@ -43,8 +42,21 @@
         
         return false;    
      }
+
      function get_outgoing_reviews(){
-        $('#resultDiv').html("Display Outgoing reviews here")
+         var request = $.ajax({
+          url: "./get_outgoing_reviews.php",
+          type: "POST",
+          success: function(data){
+            $('#resultDiv').html(data);
+          }
+        });
+        
+        request.fail(function(jqXHR, textStatus) {
+          alert( "Request failed: " + textStatus );
+        });
+        
+        return false;    
      }
    </script>
    

@@ -13,7 +13,11 @@
   <div class="valign-wrapper">
     <div class="valign container">
       <h3>Shallow Bugs</h3>
-      
+      <blockquote style="display: inline-block; margin: 0 0 20px 2.2em;">
+        <h6>Given enough eyeballs, all bugs are shallow</h6>
+        <h6>&#8211 Linus Torvalds</h6>
+      </blockquote>
+      <br>
       <form id="SignIn" action="./authenticate_signin.php" target="myIframe" method="POST">
         <label>User Name</label>
         <input name="username" type="text" size="25" />
@@ -45,7 +49,15 @@
   div.valign-wrapper {
     width: 100%;
     height: 100%;
-  }    
+  }
+  /* hanging opening quote */
+  blockquote:before {
+    display: block;
+    height: 0;
+    content: "“";
+    margin-left: -1.1em; font: italic 400%/1 Cochin,Georgia,"Times New Roman", serif;
+    color: #78909c;
+  }
   </style>
   
 </html>

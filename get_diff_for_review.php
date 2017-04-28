@@ -137,26 +137,23 @@
     $li1 = $pre_file == $nil ? "" : '<li><a href="get_file_version.php?review_id='.$_GET['review_id'].'&file_idx='.$pre_file.'">Before</a></li>';
     $li2 = $post_file == $nil ? "" : '<li><a href="get_file_version.php?review_id='.$_GET['review_id'].'&file_idx='.$post_file.'">After</a></li>';
     
-    return '<!-- Dropdown Trigger -->\
-            <div class="right-align" style="margin: 0 0 0 auto;">\
-              <a class="dropdown-button btn" href="#" data-activates="dropdown-'.$diff_counter.'">View</a>\
-              <!-- Dropdown Structure -->\
-              <ul id="dropdown-'.$diff_counter.'" class="dropdown-content">\
-                '.$li1.$li2.'\
-              </ul>\
-            </div>\
-            ';
+    $output = "var dropdown_div = $('<div class=\"valign-wrapper\" style=\"margin: 0 0 0 auto;\"></div>');
+              var dropdown_html = '<a class=\"dropdown-button btn\" href=\"#\" data-activates=\"dropdown-$diff_counter\">View</a><ul id=\"dropdown-$diff_counter\" class=\"dropdown-content\">$li1$li2</ul>';
+              var dropdown = $(dropdown_html);
+              var toggle_btn = '<i class=\"material-icons toggle-btn\" style=\"cursor: pointer;\">keyboard_arrow_down</i>';
+              dropdown_div.append(dropdown).append(toggle_btn);";
+     return $output;
   }
   
   // use the first few lines of the diff to create an html header
   function create_header_div($diff_lines, &$idx, $diff_counter) {
     $file_name = get_file_name($diff_lines[0]);
     $status = get_file_status($diff_lines, $pre_file, $post_file);
-    $dropdown = get_dropdown($pre_file, $post_file, $diff_counter);
+    $init_dropdown = get_dropdown($pre_file, $post_file, $diff_counter);
     $header_div = "var header_div = $('<div class=\"file_header_div valign-wrapper\"></div>');
                   var file_name = $('$status<h6>$file_name</h6>');
-                  var dropdown = $('$dropdown');
-                  header_div.append(file_name).append(dropdown);";
+                  $init_dropdown;
+                  header_div.append(file_name).append(dropdown_div);";
     return $header_div;
   }
    
@@ -258,19 +255,33 @@
         ';
         
     // initialize all dropdown menus
-    $php_output .= "$('.dropdown-button').dropdown({
-                        inDuration: 300,
-                        outDuration: 225,
-                        constrainWidth: true, // change width of dropdown to that of the activator
-                        hover: true, // Activate on hover
-                        gutter: 0, // Spacing from edge
-                        belowOrigin: false, // Displays dropdown below the button
-                        alignment: 'left', // Displays dropdown with edge aligned to the left of button
-                        stopPropagation: false // Stops event propagation
-                      });
-                      $(document).ready(function(){
-                        $('.tooltipped').tooltip({delay: 50});
-                      });";
+    $php_output .= "// initialize dropdowns
+                    $('.dropdown-button').dropdown({
+                      inDuration: 300,
+                      outDuration: 225,
+                      constrainWidth: true, // change width of dropdown to that of the activator
+                      hover: true, // Activate on hover
+                      gutter: 0, // Spacing from edge
+                      belowOrigin: false, // Displays dropdown below the button
+                      alignment: 'left', // Displays dropdown with edge aligned to the left of button
+                      stopPropagation: false // Stops event propagation
+                    });
+                    // initialize tooltips
+                    $(document).ready(function(){
+                      $('.tooltipped').tooltip({delay: 50});
+                    });
+                    // add listeners to toggle buttons
+                    $('.toggle-btn').on('click', function() {
+                      var code_div = $(this).closest('.file_div').children('.file_code_div');
+                      if (code_div.is(\":visible\")) {
+                        code_div.hide(500);
+                        $(this).text('keyboard_arrow_up');
+                      } else {
+                        code_div.show(500);
+                        $(this).text('keyboard_arrow_down');
+                      }
+                      //$(this).css('transform', 'rotate(180deg)');
+                    });";
                           
     // return output
     return "<script>$php_output</script>";
