@@ -92,3 +92,35 @@ i.toggle-btn {
 .file_code_div {
   padding: 5px;
 }
+
+.file_code_div > p {
+  cursor: default;
+}
+
+.file_code_div > p:hover {
+  border: 1px solid #888888;
+}
+
+.create_comment_container {
+  display: none;
+  padding: 5px 0;
+  margin: 5px 0;
+  border-style: solid;
+  border-width: 1px 0px 1px 0px;
+  border-color: #ECEFF1;
+}
+
+.create_comment_form input {
+  margin: 0 5px;
+}
+
+.create_comment_form input.cancel-btn {
+  color: #607d8b;
+  background-color: #cfd8dc;
+}
+
+.create_comment_form textarea {
+  border-top: 1px solid #ECEFF1;
+  border-right: 1px solid #ECEFF1;
+  border-left: 1px solid #ECEFF1;
+}

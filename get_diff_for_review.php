@@ -18,7 +18,7 @@
 	or die("<br>Couldn't connect");
   // Retrieve the filepath to the diff file
   $query = "WITH ordered_diffs AS (
-              SELECT filename 
+              SELECT id, filename 
               FROM diffs 
               WHERE review_id = :review_id
               ORDER BY upload_time DESC)
@@ -26,12 +26,39 @@
             FROM ordered_diffs 
             WHERE rownum = 1";
   $stmt = oci_parse($conn, $query);
+  oci_define_by_name($stmt, "ID", $diff_id);
   oci_define_by_name($stmt, "FILENAME", $diff_file_path);
   oci_bind_by_name($stmt, ':review_id', $review_id);
   oci_execute($stmt);
   oci_fetch($stmt);
+  // Retreive comments for the current diff
+  $query = "SELECT  u.user_name author, c.message, c.timestamp, c.line_number
+            FROM comments c, users u 
+            WHERE c.diff_id = :diff_id AND c.author = u.id
+            ORDER BY c.timestamp ASC";
+  $array = oci_parse($conn, $query);
+  oci_bind_by_name($array, ':diff_id', $diff_id);
+  oci_execute($array);
   oci_close($conn);
   
+  // create useful data structure out of the sql output for list of comments
+  function get_comments_as_map($array) {
+    $comment_map = array();
+    while($row=oci_fetch_array($array)){
+      $line_data = array(
+        "author" => $row['AUTHOR'],
+        "message" => $row['MESSAGE'],
+        "timestamp" => $row['TIMESTAMP']
+      );
+      if (!isset($comment_map[$row['LINE_NUMBER']])) {
+        $comment_map[$row['LINE_NUMBER']] = array($line_data);
+      } else {
+        array_push($comment_map[$row['LINE_NUMBER']], $line_data);
+      }
+    }
+    return $comment_map;
+  }
+  $comment_map = get_comments_as_map($array);
   
   /* 
    * HELPER FUNCTIONS
@@ -157,21 +184,37 @@
     return $header_div;
   }
    
+  // create comment divs for the line if there are any
+  function get_comments_for_line($line_number) {
+    global $comment_map;
+    $output = "";
+    if (!isset($comment_map[$line_number])) {
+      return $output;
+    }
+    foreach ($comment_map[$line_number] as $comment) {
+      $html_comment = "<p>".$comment['author'].": ".$comment['message']."  (".$comment['timestamp'].")</p>";
+      $output .= $html_comment;
+    }
+    return $output;
+  }
+   
   // loop through array of lines in a diff and build up a string of formatted <p>s
-  function diff_lines_to_paragraphs($diff_lines) {
+  function diff_lines_to_paragraphs($diff_lines, $start_line_number) {
+    $curr_line = $start_line_number;
     $diffs_as_p = "";
     foreach ($diff_lines as $line) {
       if (!empty($line)){
         if ($line[0] === '+'){
-          $diffs_as_p .= "<p style='margin: 0;background-color:#dbffdb;' data-internalid='1337'>$line</p>";
+          $diffs_as_p .= "<p style='margin: 0;background-color:#dbffdb;'>$line</p>";
         } elseif ($line[0] === '-'){
-          $diffs_as_p .= "<p style='margin: 0;background-color:#f1c0c0;' data-internalid='1337'>$line</p>";
+          $diffs_as_p .= "<p style='margin: 0;background-color:#f1c0c0;'>$line</p>";
         } else {
           $diffs_as_p .= "<p style='margin: 0;'>$line</p>";
         }
       } else {
         $diffs_as_p .= "<p style='margin: 0;'>$line</p>";
       }
+      $diffs_as_p .= get_comments_for_line($curr_line++);
     }
     return $diffs_as_p;
   }
@@ -203,7 +246,7 @@
     
     } else {    
       // loop through lines in the current diff
-      $diffs_as_p = diff_lines_to_paragraphs($diff_lines);
+      $diffs_as_p = diff_lines_to_paragraphs($diff_lines, $start_line_idx);
       $diff_str .= "var diffs_as_p = $(\"$diffs_as_p\");
                     for (var i=0; i<diffs_as_p.length; ++i) {
                       $(diffs_as_p[i]).data('line_number', $start_line_idx + i);
@@ -244,7 +287,7 @@
     $diff_lines = explode("\n", $diff_contents);
     array_pop($diff_lines); // last entry is empty from explode()ing on a trailing \n
     
-    echo diff_lines_to_paragraphs($diff_lines);
+    echo diff_lines_to_paragraphs($diff_lines, $diff_start_line);
     
   } else {
     $diffs_by_file = get_diffs_arr_by_file($diff_file_path);

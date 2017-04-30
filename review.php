@@ -27,6 +27,21 @@
   oci_bind_by_name($stmt, ':review_id', $review_id);
   oci_execute($stmt);
   oci_fetch($stmt);
+  
+  // Retrieve diff id
+  $query = "WITH ordered_diffs AS (
+              SELECT id 
+              FROM diffs 
+              WHERE review_id = :review_id
+              ORDER BY upload_time DESC)
+            SELECT * 
+            FROM ordered_diffs 
+            WHERE rownum = 1";
+  $stmt = oci_parse($conn, $query);
+  oci_define_by_name($stmt, "ID", $diff_id);
+  oci_bind_by_name($stmt, ':review_id', $review_id);
+  oci_execute($stmt);
+  oci_fetch($stmt);
   oci_close($conn);
 ?>
 
@@ -89,19 +104,67 @@
         
       </div>
     </div>
-    
-    <!-- Modal for commenting -->
-    <div id="comment_modal" class="modal">
-      <div class="modal-content">
-        <h4>Modal Header</h4>
-        <p>A bunch of text</p>
-      </div>
-      <div class="modal-footer">
-        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
-      </div>
-    </div>
   
   <script>
+  /*
+   * Helper functions for comments
+   */
+   // use ajax to submit the comment
+   function submit_comment(text, line, comment_div) {
+     
+     var request = $.ajax({
+        url: "submit_comment.php",
+        type: "POST",
+        data: {
+          author: "<?php echo $user_id;?>",
+          diff_id: <?php echo $diff_id;?>,
+          message: text,
+          line_number: line
+        }
+      });
+      
+      request.success(function(data) {
+        comment_div.hide(500, function() {
+          $(this).remove();
+        });
+      });
+      
+      request.fail(function(jqXHR, textStatus) {
+        alert( "Request failed: " + textStatus );
+      });
+
+      return false;   
+   }
+   
+   // create & return a "write comment" box
+   function get_create_comment_div(line_number) {
+     var $container = $('<div class="create_comment_container"></div>');
+     var $form = $('<form class="create_comment_form"></form>');
+     var $inputbox = $('<div class="input-field">\
+            <textarea id="new_comment" name="comment_text" class="materialize-textarea"></textarea>\
+            <label for="new_comment">Your comment</label>\
+          </div>');
+     var $btn_div = $('<div class="right-align"></div>');
+     var $submit_btn = $('<input name="submit_comment" type="button" value="post" class="waves-effect waves-light btn" />');
+     $submit_btn.data('line_number', line_number);
+     $submit_btn.on('click', function() {
+       var comment_line = $(this).data('line_number');
+       var comment_text = $(this).closest('.create_comment_form').find('textarea').val();
+       var comment_div = $(this).closest('.create_comment_container');
+       submit_comment(comment_text, comment_line, comment_div);
+     });
+     var $cancel_btn = $('<input name="cancel_comment" type="button" value="cancel" class="cancel-btn waves-effect waves-light btn" />');
+     $cancel_btn.on('click', function() {
+       var hide_div = $(this).closest('.create_comment_container').hide(500, function() {
+         $(this).remove();
+       });
+     });
+     $btn_div.append($cancel_btn).append($submit_btn);
+     $form.append($inputbox).append($btn_div);
+     $container.append($form);
+     return $container;
+   }
+   
   /*
    * Define callbacks for after ajax returns the diff text
    */
@@ -165,8 +228,10 @@
   
   function add_code_line_listener() {
     $(".file_code_div > p").on("click", function() {
-      $('#comment_modal').modal('open');
-      console.log($(this).data('line_number'));
+      var self = $(this);
+      var $comment = get_create_comment_div(self.data('line_number'));
+      self.after($comment);
+      $comment.show(500);
     });
   }
    
