@@ -21,7 +21,7 @@
 
   </head>
 
-  <body onload="get_incoming_reviews();" style="background-color:#BFEFFF">
+  <body onload="get_incoming_reviews();" style="background-color:#BFEFFF;">
 
      <?php include("navbar.php"); ?>
 

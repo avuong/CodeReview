@@ -140,7 +140,7 @@
     $output = "var dropdown_div = $('<div class=\"valign-wrapper\" style=\"margin: 0 0 0 auto;\"></div>');
               var dropdown_html = '<a class=\"dropdown-button btn\" href=\"#\" data-activates=\"dropdown-$diff_counter\">View</a><ul id=\"dropdown-$diff_counter\" class=\"dropdown-content\">$li1$li2</ul>';
               var dropdown = $(dropdown_html);
-              var toggle_btn = '<i class=\"material-icons toggle-btn\">keyboard_arrow_down</i>';
+              var toggle_btn = '<i class=\"material-icons toggle-btn\">keyboard_arrow_up</i>';
               dropdown_div.append(dropdown).append(toggle_btn);";
      return $output;
   }
@@ -159,21 +159,21 @@
    
   // loop through array of lines in a diff and build up a string of formatted <p>s
   function diff_lines_to_paragraphs($diff_lines) {
-   $diffs_as_p = "";
-   foreach ($diff_lines as $line) {
-     if (!empty($line)){
-       if ($line[0] === '+'){
-         $diffs_as_p .= "<p style='margin: 0;background-color:#dbffdb;'>$line</p>";
-       } elseif ($line[0] === '-'){
-         $diffs_as_p .= "<p style='margin: 0;background-color:#f1c0c0;'>$line</p>";
-       } else {
-         $diffs_as_p .= "<p style='margin: 0;'>$line</p>";
-       }
-     } else {
-       $diffs_as_p .= "<p style='margin: 0;'>$line</p>";
-     }
-   }
-   return $diffs_as_p;
+    $diffs_as_p = "";
+    foreach ($diff_lines as $line) {
+      if (!empty($line)){
+        if ($line[0] === '+'){
+          $diffs_as_p .= "<p style='margin: 0;background-color:#dbffdb;' data-internalid='1337'>$line</p>";
+        } elseif ($line[0] === '-'){
+          $diffs_as_p .= "<p style='margin: 0;background-color:#f1c0c0;' data-internalid='1337'>$line</p>";
+        } else {
+          $diffs_as_p .= "<p style='margin: 0;'>$line</p>";
+        }
+      } else {
+        $diffs_as_p .= "<p style='margin: 0;'>$line</p>";
+      }
+    }
+    return $diffs_as_p;
   }
  
   // Given a diff file, format it nicely using html, then return the string
@@ -204,7 +204,11 @@
     } else {    
       // loop through lines in the current diff
       $diffs_as_p = diff_lines_to_paragraphs($diff_lines);
-      $diff_str .= "code_div.append(\"$diffs_as_p\");";
+      $diff_str .= "var diffs_as_p = $(\"$diffs_as_p\");
+                    for (var i=0; i<diffs_as_p.length; ++i) {
+                      $(diffs_as_p[i]).data('line_number', $start_line_idx + i);
+                    }
+                    code_div.append(diffs_as_p);";
     }
     
     $diff_str .= "file_div.append(code_div);
@@ -226,62 +230,7 @@
       $php_output .= diff_to_html_string($file_diff, $max_diff_size, $start_line_idx, $end_line_idx, $diff_counter);
       ++$diff_counter;
     }
-    
-    // Add a listener to the "load diff" buttons that calls this script to retrieve single diff
-    $php_output .= '
-        $(".load_diff").on("click", function() {
-        
-          var self = this;
-          var request = $.ajax({
-            url: "./get_diff_for_review.php",
-            type: "GET",
-            data: {
-              review_id: "'.$_GET['review_id'].'",
-              start_line: $(this).data("start_line"),
-              end_line: $(this).data("end_line")
-            }
-          });
-          
-          request.success(function(data) {
-            $(self).parent().html(data);
-          });
-          
-          request.fail(function(jqXHR, textStatus) {
-            alert( "Request failed: " + textStatus );
-          });
-          
-          return false;
-        });
-        ';
-        
-    // initialize all dropdown menus
-    $php_output .= "// initialize dropdowns
-                    $('.dropdown-button').dropdown({
-                      inDuration: 300,
-                      outDuration: 225,
-                      constrainWidth: true, // change width of dropdown to that of the activator
-                      hover: true, // Activate on hover
-                      gutter: 0, // Spacing from edge
-                      belowOrigin: false, // Displays dropdown below the button
-                      alignment: 'left', // Displays dropdown with edge aligned to the left of button
-                      stopPropagation: false // Stops event propagation
-                    });
-                    // initialize tooltips
-                    $(document).ready(function(){
-                      $('.tooltipped').tooltip({delay: 50});
-                    });
-                    // add listeners to toggle buttons
-                    $('.toggle-btn').on('click', function() {
-                      var code_div = $(this).closest('.file_div').children('.file_code_div');
-                      if (code_div.is(\":visible\")) {
-                        code_div.hide(500);
-                        $(this).text('keyboard_arrow_up');
-                      } else {
-                        code_div.show(500);
-                        $(this).text('keyboard_arrow_down');
-                      }
-                    });";
-                          
+           
     // return output
     return "<script>$php_output</script>";
   }

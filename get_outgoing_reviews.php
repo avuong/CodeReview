@@ -22,8 +22,8 @@
   $array = oci_parse($conn, $query);
   oci_execute($array);
   
-  echo '<table class="table table-striped table-bordered table-hover">'; 
-  echo "<tr><th>ID</th><th>Summary</th><th>Date</th><th>Submitter</th></tr>";
+  echo '<table class="table table-striped table-bordered table-hover highlight">'; 
+  echo "<thead><tr><th>ID</th><th>Summary</th><th>Date</th><th>Submitter</th></tr></thead>";
   while($row=oci_fetch_array($array)){
     //echo $row[0]." ".$row[1];
     echo "<tr><td>"; 

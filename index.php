@@ -8,7 +8,7 @@
     include("head.php"); 
   ?>
   
-  <body style="background-color:#BFEFFF">
+  <body style="background-color:#BFEFFF;">
     
   <div class="valign-wrapper">
     <div class="valign container">

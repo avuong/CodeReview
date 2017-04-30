@@ -89,8 +89,90 @@
         
       </div>
     </div>
+    
+    <!-- Modal for commenting -->
+    <div id="comment_modal" class="modal">
+      <div class="modal-content">
+        <h4>Modal Header</h4>
+        <p>A bunch of text</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+      </div>
+    </div>
   
   <script>
+  /*
+   * Define callbacks for after ajax returns the diff text
+   */
+  function add_load_more_listener() {
+    $(".load_diff").on("click", function() {        
+      var self = this;
+      var request = $.ajax({
+        url: "./get_diff_for_review.php",
+        type: "GET",
+        data: {
+          review_id: "<?php echo $review_id;?>",
+          start_line: $(this).data("start_line"),
+          end_line: $(this).data("end_line")
+        }
+      });
+      
+      request.success(function(data) {
+        $(self).parent().html(data);
+      });
+      
+      request.fail(function(jqXHR, textStatus) {
+        alert( "Request failed: " + textStatus );
+      });
+      
+      return false;
+    });
+  }
+  
+  function init_materialize_objs() {
+    // initialize dropdowns
+    $(function() {
+      $('.dropdown-button').dropdown({
+        inDuration: 300,
+        outDuration: 225,
+        constrainWidth: true, // change width of dropdown to that of the activator
+        hover: true, // Activate on hover
+        gutter: 0, // Spacing from edge
+        belowOrigin: false, // Displays dropdown below the button
+        alignment: 'left', // Displays dropdown with edge aligned to the left of button
+        stopPropagation: false // Stops event propagation
+      });
+      // initialize tooltips
+      $('.tooltipped').tooltip({delay: 50});
+      // initialize modals
+      $('.modal').modal();
+    })
+  }
+  
+  function add_toggle_listener() {
+    $('.toggle-btn').on('click', function() {
+      var code_div = $(this).closest('.file_div').children('.file_code_div');
+      if (code_div.is(":visible")) {
+        code_div.hide(500);
+        $(this).text('keyboard_arrow_down');
+      } else {
+        code_div.show(500);
+        $(this).text('keyboard_arrow_up');
+      }
+    });
+  }
+  
+  function add_code_line_listener() {
+    $(".file_code_div > p").on("click", function() {
+      $('#comment_modal').modal('open');
+      console.log($(this).data('line_number'));
+    });
+  }
+   
+   /*
+    * Make an async request for the diff data in html format
+    */
   $(function() {
     function get_diff(){
       var request = $.ajax({
@@ -103,6 +185,10 @@
       
       request.success(function(data) {
         $("#diff_div").html(data);
+        add_load_more_listener();
+        init_materialize_objs();
+        add_toggle_listener();
+        add_code_line_listener();
       });
       
       request.fail(function(jqXHR, textStatus) {
