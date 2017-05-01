@@ -46,6 +46,7 @@
   oci_execute($stmt);
   oci_fetch($stmt);
   oci_close($conn);
+  
 ?>
 
 <html>
@@ -60,6 +61,13 @@
   
   <body>
     <?php include("navbar.php"); ?>
+    <?php
+      // if the review was just created, alert the user that it was created
+      if (isset($_SESSION['review_created']) && $_SESSION['review_created']==true) {
+        echo "<script>Materialize.toast('Review created!', 4000);</script>";
+        unset($_SESSION['review_created']);
+      }
+    ?>
     
     <div class="container">
       <div id="review_title_div" class="row">
@@ -111,6 +119,7 @@
     </div>
   
   <script>
+  
   /*
    * Helper functions for comments
    */

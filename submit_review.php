@@ -81,6 +81,7 @@
   oci_close($conn);
   
   // Redirect to created review
+  $_SESSION['review_created'] = true;
   header("Location: review.php?id=".$review_id);
   exit();
 ?>

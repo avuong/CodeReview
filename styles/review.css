@@ -21,6 +21,13 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 20px;
 }
 
+#toast-container {
+  left: 50%;
+  bottom: 20px;
+  transform: translate(-50%, -50%);
+  margin: 0 auto; 
+}
+
 /*
  * DETAILS TAB
  */
