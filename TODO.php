@@ -26,5 +26,10 @@ include("navbar.php");
       <a href="https://github.com/pdrumm/SpaceGame/commit/d9c9586726bb3378703a670545e9892c0dd14034">This</a>
       should not be possible...
     </li>
+    <li class="collection-item">
+      -Basic functionality of groups is done -> when they create a group we will write that to the database and add all the correct users into to users_groups_junction table...need to make form look nicer and do some error checking. Ex.) multiple groups with same name can be made...need unique constraint? , etc...
+      -Chip for users
+      -display table of groups to users on different page than form
+    </li>
   </ul>
 </div>
