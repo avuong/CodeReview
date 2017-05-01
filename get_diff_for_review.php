@@ -199,13 +199,13 @@
   // create comment divs for the line if there are any
   function get_comments_for_line($line_number) {
     global $comment_map;
-    $output = "";
+    $output = "var comments = null;";
     // return early if no comments for given line
     if (!isset($comment_map[$line_number])) {
       return $output;
     }
     // create the comments
-    $output .= "var comments = $('<div class=\"code-line-comment-container\"></div>');";
+    $output = "var comments = $('<div class=\"code-line-comment-container\"></div>');";
     $div_color = 0;
     foreach ($comment_map[$line_number] as $comment) {
       $output .= get_new_comment($comment['comment_id'], $comment['author_id'], $comment['author'], $comment['message'], $comment['timestamp'], $div_color);
@@ -239,7 +239,6 @@
                   code_line_container.data(\"line_number\", $curr_line);
                   pre.append(code_line);
                   code_line_container.append(pre).append(comments);
-                  comments = null; // must reset comments or else it doesnt work...
                   $container_div.append(code_line_container);";
       ++$curr_line;
     }

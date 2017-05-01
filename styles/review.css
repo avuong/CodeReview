@@ -146,6 +146,36 @@ i.toggle-btn {
   margin-bottom: 10px;
 }
 
+
+/* Reply form */
+.create_reply_container {
+  display: none;
+  background-color: #ECEFF1;
+  padding: 10px;
+  border-style: solid;
+  border-width: 1px 1px 1px 1px;
+  border-color: #b0bec5;
+  border-radius: 2px;
+  margin: 5px 5px 5px 20px;
+}
+
+.create_reply_form input {
+  margin: 0 5px;
+}
+
+.create_reply_form input.cancel-btn {
+  color: #607d8b;
+  background-color: #cfd8dc;
+}
+
+.create_reply_form textarea {
+  border-top: 1px solid #ECEFF1;
+  border-right: 1px solid #ECEFF1;
+  border-left: 1px solid #ECEFF1;
+  background-color: white;
+  margin-bottom: 10px;
+}
+
 /* Read old comment */
 .code-line-comment-container {
   border: 1px solid #546e7a;

@@ -7,18 +7,20 @@
   $diff_id = $_POST['diff_id'];
   $message = $_POST['message'];
   $line_number = $_POST['line_number'];
+  $parent_id = $_POST['parent_id'];
   
   // Connect to DB and insert comment
   $conn = oci_connect("guest", "guest")
   or die ("<br>Couldn't connect");
   
   // Insert the new Review record
-  $query = "INSERT into COMMENTS(author, message, timestamp, diff_id, line_number) values(:author, :message, sysdate, :diff_id, :line_number)";
+  $query = "INSERT into COMMENTS(author, message, timestamp, diff_id, line_number, parent_comment) values(:author, :message, sysdate, :diff_id, :line_number, :parent_comment)";
 	$stmt = oci_parse($conn, $query);
 	oci_bind_by_name($stmt,':author', $author);
 	oci_bind_by_name($stmt,':message', $message);
 	oci_bind_by_name($stmt,':diff_id', $diff_id);
 	oci_bind_by_name($stmt,':line_number', $line_number);
+	oci_bind_by_name($stmt,':parent_comment', $parent_id);
 	oci_execute($stmt);
   oci_close($conn);
   

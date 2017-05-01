@@ -38,5 +38,8 @@ include("navbar.php");
     <li class="collection-item">
       <b>DEMO:</b> Remove TODO from the navbar
     </li>
+    <li class="collection-item">
+      <b>DEMO or at least before final submit:</b> Just manually simulate different user activity to make sure everything is running smoothly
+    </li>
   </ul>
 </div>

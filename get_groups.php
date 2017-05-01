@@ -26,7 +26,7 @@ require("authenticate_visitor.php");
   echo '<table class="table table-striped table-bordered table-hover highlight">'; 
   echo "<thead><tr><th>Group Name</th><th>Description</th></tr></thead>";
   while($row=oci_fetch_array($array)){
-    echo "<tr><td>"; 
+    echo "<tr id='modal_click' data-target='modal1'><td id='group_name'>"; 
     echo $row['NAME'];
     echo "</td><td>";   
     echo $row['DETAIL'];

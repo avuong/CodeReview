@@ -110,7 +110,7 @@
    * Helper functions for comments
    */
    // use ajax to submit the comment
-   function submit_comment(text, line, new_comment_div) {
+   function submit_comment(text, line, parent_id, new_comment_div) {
      
      var request = $.ajax({
         url: "submit_comment.php",
@@ -119,7 +119,8 @@
           author: "<?php echo $user_id;?>",
           diff_id: <?php echo $diff_id;?>,
           message: text,
-          line_number: line
+          line_number: line,
+          parent_id: parent_id
         }
       });
       
@@ -197,11 +198,42 @@
        var comment_line = $(this).data('line_number');
        var comment_text = $(this).closest('.create_comment_form').find('textarea').val();
        var comment_div = $(this).closest('.create_comment_container');
-       submit_comment(comment_text, comment_line, comment_div);
+       submit_comment(comment_text, comment_line, null, comment_div);
      });
      var $cancel_btn = $('<input name="cancel_comment" type="button" value="cancel" class="cancel-btn waves-effect waves-light btn" />');
      $cancel_btn.on('click', function() {
        var hide_div = $(this).closest('.create_comment_container').hide(500, function() {
+         $(this).remove();
+       });
+     });
+     $btn_div.append($cancel_btn).append($submit_btn);
+     $form.append($inputbox).append($btn_div);
+     $container.append($form);
+     return $container;
+   }
+   
+   // create & return a "reply comment" box
+   function get_create_reply_div(comment_id, line_number) {
+     var $container = $('<div class="create_reply_container"></div>');
+     var $form = $('<form class="create_reply_form"></form>');
+     var $inputbox = $('<div class="input-field">\
+            <textarea id="new_reply" name="reply_text" class="materialize-textarea"></textarea>\
+            <label for="new_reply">Your comment</label>\
+          </div>');
+     var $btn_div = $('<div class="right-align"></div>');
+     var $submit_btn = $('<input name="submit_reply" type="button" value="post" class="waves-effect waves-light btn" />');
+     $submit_btn.data('comment_id', comment_id);
+     $submit_btn.data('line_number', line_number);
+     $submit_btn.on('click', function() {
+       var parent_comment = $(this).data('comment_id');
+       var comment_line = $(this).data('line_number');
+       var comment_text = $(this).closest('.create_reply_form').find('textarea').val();
+       var comment_div = $(this).closest('.create_reply_container');
+       submit_comment(comment_text, comment_line, parent_comment, comment_div);
+     });
+     var $cancel_btn = $('<input name="cancel_reply" type="button" value="cancel" class="cancel-btn waves-effect waves-light btn" />');
+     $cancel_btn.on('click', function() {
+       var hide_div = $(this).closest('.create_reply_container').hide(500, function() {
          $(this).remove();
        });
      });
@@ -296,7 +328,14 @@
     
     $(".reply-comment").off("click");
     $(".reply-comment").on("click", function() {
-      console.log($(this).closest('.code-line-comment').data());
+      console.log($(this).closest('.code-line-comment').data('comment_id'));
+      console.log($(this).closest('.code-line-container').data('line_number'));
+      var $reply = get_create_reply_div(
+        $(this).closest('.code-line-comment').data('comment_id'),
+        $(this).closest('.code-line-container').data('line_number')
+      );
+      $(this).closest('.code-line-comment').after($reply);
+      $reply.show(500);
     });
     $(".edit-comment").off("click");
     $(".edit-comment").on("click", function() {
