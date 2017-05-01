@@ -36,6 +36,22 @@
         
         return false;    
      }
+
+    function get_members(){
+        var request = $.ajax({
+          url: "./get_groups.php",
+          type: "POST",
+          success: function(data){
+            $('#resultDiv').html(data);
+          }
+        });
+        
+        request.fail(function(jqXHR, textStatus) {
+          alert( "Request failed: " + textStatus );
+        });
+        
+        return false;    
+     }
       //need this to trigger modal opening
       $(document).ready(function(){
         // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
@@ -48,16 +64,17 @@
       <div id="modal1" class="modal modal-fixed-footer">
         <div class="modal-content">
           <h4>Group Members</h4>
-          <div class="modal-body">
+          <div id="modal-body">
             <p>A bunch of text</p>
           </div>
         </div>
         <div class="modal-footer">
-          <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Agree</a>
+          <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">OK</a>
         </div>
       </div>
 
      <script>
+        //when user clicks on table row
         $('#resultDiv').on('click', 'table tr', function() {
             //get the Group name on the table row we clicked on to pass to PHP script
             var $row = $(this).closest("tr"),
@@ -65,9 +82,23 @@
 
             $.each($tds, function() {
                 //below this the group name
-                console.log($(this).text());
+                var $group_name = $(this).text();
+                console.log($group_name);
+
+
+                //need to get group name out of function above and here
+                //encode URI spaces are weird need to encode them
+                var actual_url = './get_members.php?name=' + encodeURIComponent($group_name.trim());
+                // get group members
+                //TODO: pass in argument of $group_name
+                $.get(actual_url, function(data) {
+                    // use the result
+                    $('#modal-body').html(data);
+                });
             });
+
         });
+
      </script>
 
   </body>

@@ -11,11 +11,6 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 25px;
 }
 
-.section {
-  #border: 1px solid #455A64;
-  background-color: #ECEFF1;
-}
-
 .tab {
   #border-radius: 10px 10px 0 0;
   #border: 1px solid #ECEFF1;
@@ -25,6 +20,29 @@ h1, h2, h3, h4, h5, h6 {
 .tabs {
   margin-bottom: 20px;
 }
+
+/*
+ * DETAILS TAB
+ */
+ 
+ #details_container {
+  border-radius: 2px;
+  border-width: 1px;
+  border-color: #cfd8dc;
+  border-style: solid;
+  background-color: #cfd8dc;
+  padding: 20px 30px;
+ }
+ 
+.section {
+  #border: 1px solid #455A64;
+  background-color: white;
+  border-radius: 2px;
+}
+
+/*
+ * DIFF TAB
+ */
 
 /* CSS for each file container */
 
@@ -186,7 +204,7 @@ i.toggle-btn {
   margin: 0;
 }
 .code-line-comment {
-  padding: 5px;
+  padding: 5px 0 5px 5px;
 }
 .comment-light {
   background-color: white; /*#eceff1*/
@@ -201,6 +219,7 @@ i.toggle-btn {
 .comment-timestamp {
   display: inline;
   float: right;
+  margin-right: 8px;
   color: #78909c;
 }
 .comment-message {
@@ -216,4 +235,5 @@ i.toggle-btn {
 }
 .code-line-reply-container {
   margin-left: 20px;
+  border: 1px solid #eceff1;
 }

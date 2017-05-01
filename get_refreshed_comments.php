@@ -45,18 +45,19 @@
     return $comment_map;
   }
   
-  function get_child_comments($child_comment_map, $level=0) {
+  function get_child_comments($child_comment_map, $div_color, $level=0) {
     $output = "var child_comments$level = $('<div class=\"code-line-reply-container test$level\"></div>');";
     foreach ($child_comment_map as $comment) {
       if (isset($comment['replies'])) {
-        $output .= get_child_comments($comment['replies'], $level+1 );
+        $output .= get_child_comments($comment['replies'], 1-$div_color, $level+1 );
       }
-      $output .= get_new_comment($comment['comment_id'], $comment['author_id'], $comment['author'], $comment['message'], $comment['timestamp'], 1);
+      $output .= get_new_comment($comment['comment_id'], $comment['author_id'], $comment['author'], $comment['message'], $comment['timestamp'], $div_color);
       if (isset($comment['replies'])) {
         $child_idx = $level+1;
         $output .= "new_comment.append(child_comments$child_idx);";
       }
       $output .= "child_comments$level.append(new_comment);";
+      $div_color = 1 - $div_color;
     }
     return $output;
   }  
@@ -96,7 +97,7 @@
     $div_color = 0;
     foreach ($comment_map as $comment) {
       if (isset($comment['replies'])) {
-        $output .= get_child_comments($comment['replies']);  // creates `child_comments`
+        $output .= get_child_comments($comment['replies'], 1-$div_color);  // creates `child_comments`
       }
       $output .= get_new_comment($comment['comment_id'], $comment['author_id'], $comment['author'], $comment['message'], $comment['timestamp'], $div_color);  // creates `new_comment`
       if (isset($comment['replies'])) {

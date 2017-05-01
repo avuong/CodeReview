@@ -15,6 +15,9 @@
   // Retrieve review data
   $conn = oci_connect("guest", "guest", "xe")
 	or die("<br>Couldn't connect");
+  $query = "alter session set NLS_DATE_FORMAT = 'mon dd, yyyy HH:miam'";
+  $stmt = oci_parse($conn, $query);
+  oci_execute($stmt);
   $query = "SELECT r.summary, r.description, r.timestamp, u.user_name, r.owner
             FROM reviews r, users u 
             WHERE r.id = :review_id AND r.owner = u.id";
@@ -71,31 +74,33 @@
           </ul>
         </div>
         
-        <div id="details_div" class="col s12">
-          <div class="row">
-            <h5>Summary</h5>
-            <div class="col s6 section">
-              <?php echo $summary;?>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col s6">
-              <h5>Owner</h5>
-              <div class="col s12 section">
-                <?php echo $owner_name;?>
+        <div id="details_div">
+          <div id="details_container" class="z-depth-2 col s12">
+            <div class="row">
+              <h5>Summary</h5>
+              <div class="col s6 section">
+                <p><?php echo $summary;?></p>
               </div>
             </div>
-            <div class="col s6">
-              <h5>Last modified</h5>
+            <div class="row">
+              <h5>Description</h5>
               <div class="col s12 section">
-                <?php echo $timestamp;?>
+                <p><?php echo $description;?></p>
               </div>
             </div>
-          </div>
-          <div class="row">
-            <h5>Description</h5>
-            <div class="col s12 section">
-              <?php echo $description;?>
+            <div class="row">
+              <div class="col s6">
+                <h5>Owner</h5>
+                <div class="col s12 section">
+                  <p><?php echo $owner_name;?></p>
+                </div>
+              </div>
+              <div class="col s6">
+                <h5>Last modified</h5>
+                <div class="col s12 section">
+                  <p><?php echo $timestamp;?></p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
