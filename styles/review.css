@@ -214,3 +214,6 @@ i.toggle-btn {
   margin-right: 7px;
   text-decoration: underline;
 }
+.code-line-reply-container {
+  margin-left: 20px;
+}

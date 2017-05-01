@@ -39,7 +39,7 @@
   $query = "alter session set NLS_DATE_FORMAT = 'mon dd, yyyy HH:miam'";
   $stmt = oci_parse($conn, $query);
   oci_execute($stmt);
-  $query = "SELECT  c.id, c.author author_id, u.user_name author, c.message, c.timestamp, c.line_number
+  $query = "SELECT  c.id, c.author author_id, u.user_name author, c.message, c.timestamp, c.line_number, c.parent_comment
             FROM comments c, users u 
             WHERE c.diff_id = :diff_id AND c.author = u.id
             ORDER BY c.timestamp ASC";
@@ -49,6 +49,29 @@
   oci_close($conn);
   
   // create useful data structure out of the sql output for list of comments
+  function add_to_parent($new_comment, $new_comment_parent_id, &$comment_map) {
+    // loop through all comments
+    foreach ($comment_map as &$comment) {
+      // if this comment is the new comment's parent then add it to the parent's reply list
+      if($comment['comment_id']==$new_comment_parent_id) {
+        if (isset($comment['replies'])) {
+          array_push($comment['replies'], $new_comment);
+        } else {
+          $comment['replies'] = array($new_comment);
+        }
+        return true;
+      }
+      // if this comment has replies, then recurse
+      if (isset($comment['replies'])) {
+        $r = add_to_parent($new_comment, $new_comment_parent_id, $comment['replies']);
+        if ($r) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  
   function get_comments_as_map($array) {
     $comment_map = array();
     while($row=oci_fetch_array($array)){
@@ -60,9 +83,16 @@
         "timestamp" => $row['TIMESTAMP']
       );
       if (!isset($comment_map[$row['LINE_NUMBER']])) {
+        // first comment for the current line
         $comment_map[$row['LINE_NUMBER']] = array($line_data);
       } else {
-        array_push($comment_map[$row['LINE_NUMBER']], $line_data);
+        // if there is no parent comment then add it to the base level comments
+        if (!isset($row['PARENT_COMMENT'])) {
+          array_push($comment_map[$row['LINE_NUMBER']], $line_data);
+        // otherwise lets find its parent
+        } else {
+          add_to_parent($line_data, $row['PARENT_COMMENT'], $comment_map[$row['LINE_NUMBER']]);
+        }
       }
     }
     return $comment_map;
@@ -196,6 +226,22 @@
   // contains `function get_new_comment($comment_id, $author_id, $author, $message, $timestamp, $div_color)`
   require("get_new_comment.php");
    
+  function get_child_comments($child_comment_map, $level=0) {
+    $output = "var child_comments$level = $('<div class=\"code-line-reply-container test$level\"></div>');";
+    foreach ($child_comment_map as $comment) {
+      if (isset($comment['replies'])) {
+        $output .= get_child_comments($comment['replies'], $level+1 );
+      }
+      $output .= get_new_comment($comment['comment_id'], $comment['author_id'], $comment['author'], $comment['message'], $comment['timestamp'], 1);
+      if (isset($comment['replies'])) {
+        $child_idx = $level+1;
+        $output .= "new_comment.append(child_comments$child_idx);";
+      }
+      $output .= "child_comments$level.append(new_comment);";
+    }
+    return $output;
+  }  
+   
   // create comment divs for the line if there are any
   function get_comments_for_line($line_number) {
     global $comment_map;
@@ -208,7 +254,13 @@
     $output = "var comments = $('<div class=\"code-line-comment-container\"></div>');";
     $div_color = 0;
     foreach ($comment_map[$line_number] as $comment) {
-      $output .= get_new_comment($comment['comment_id'], $comment['author_id'], $comment['author'], $comment['message'], $comment['timestamp'], $div_color);
+      if (isset($comment['replies'])) {
+        $output .= get_child_comments($comment['replies']);  // creates `child_comments`
+      }
+      $output .= get_new_comment($comment['comment_id'], $comment['author_id'], $comment['author'], $comment['message'], $comment['timestamp'], $div_color);  // creates `new_comment`
+      if (isset($comment['replies'])) {
+        $output .= "new_comment.append(child_comments0);";
+      }
       $output .= "comments.append(new_comment);";
       $div_color = 1 - $div_color;
     }
