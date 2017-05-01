@@ -1,4 +1,7 @@
 <?php
+  // Authenticate
+  require("authenticate_visitor.php");
+
   /*
    * HANDLE GET REQUEST VARS
    */
@@ -31,8 +34,12 @@
   oci_bind_by_name($stmt, ':review_id', $review_id);
   oci_execute($stmt);
   oci_fetch($stmt);
+  
   // Retreive comments for the current diff
-  $query = "SELECT  u.user_name author, c.message, c.timestamp, c.line_number
+  $query = "alter session set NLS_DATE_FORMAT = 'mon dd, yyyy HH:miam'";
+  $stmt = oci_parse($conn, $query);
+  oci_execute($stmt);
+  $query = "SELECT  c.id, c.author author_id, u.user_name author, c.message, c.timestamp, c.line_number
             FROM comments c, users u 
             WHERE c.diff_id = :diff_id AND c.author = u.id
             ORDER BY c.timestamp ASC";
@@ -46,6 +53,8 @@
     $comment_map = array();
     while($row=oci_fetch_array($array)){
       $line_data = array(
+        "comment_id" => $row['ID'],
+        "author_id" => $row['AUTHOR_ID'],
         "author" => $row['AUTHOR'],
         "message" => $row['MESSAGE'],
         "timestamp" => $row['TIMESTAMP']
@@ -183,40 +192,58 @@
                   header_div.append(file_name).append(dropdown_div);";
     return $header_div;
   }
+  
+  // contains `function get_new_comment($comment_id, $author_id, $author, $message, $timestamp, $div_color)`
+  require("get_new_comment.php");
    
   // create comment divs for the line if there are any
   function get_comments_for_line($line_number) {
     global $comment_map;
     $output = "";
+    // return early if no comments for given line
     if (!isset($comment_map[$line_number])) {
       return $output;
     }
+    // create the comments
+    $output .= "var comments = $('<div class=\"code-line-comment-container\"></div>');";
+    $div_color = 0;
     foreach ($comment_map[$line_number] as $comment) {
-      $html_comment = "<p>".$comment['author'].": ".$comment['message']."  (".$comment['timestamp'].")</p>";
-      $output .= $html_comment;
+      $output .= get_new_comment($comment['comment_id'], $comment['author_id'], $comment['author'], $comment['message'], $comment['timestamp'], $div_color);
+      $output .= "comments.append(new_comment);";
+      $div_color = 1 - $div_color;
     }
     return $output;
   }
    
   // loop through array of lines in a diff and build up a string of formatted <p>s
-  function diff_lines_to_paragraphs($diff_lines, $start_line_number) {
+  function append_diff_lines_to_div($diff_lines, $container_div, $start_line_number) {
     $curr_line = $start_line_number;
-    $diffs_as_p = "";
+    $output = "";
     foreach ($diff_lines as $line) {
+      $line = addslashes($line);
+      $output .= "var code_line_container = $('<div class=\"code-line-container\"></div>');";
       if (!empty($line)){
         if ($line[0] === '+'){
-          $diffs_as_p .= "<p style='margin: 0;background-color:#dbffdb;'>$line</p>";
+          $output .= "var code_line = $('<p class=\"code-line added-code\">$line</p>');";
         } elseif ($line[0] === '-'){
-          $diffs_as_p .= "<p style='margin: 0;background-color:#f1c0c0;'>$line</p>";
+          $output .= "var code_line = $('<p class=\"code-line deleted-code\">$line</p>');";
         } else {
-          $diffs_as_p .= "<p style='margin: 0;'>$line</p>";
+          $output .= "var code_line = $('<p class=\"code-line\">$line</p>');";
         }
       } else {
-        $diffs_as_p .= "<p style='margin: 0;'>$line</p>";
+        $output .= "var code_line = $('<p class=\"code-line\">$line</p>');";
       }
-      $diffs_as_p .= get_comments_for_line($curr_line++);
+      $comments = get_comments_for_line($curr_line);
+      $output .= "$comments
+                  var pre = $('<pre></pre>');
+                  code_line_container.data(\"line_number\", $curr_line);
+                  pre.append(code_line);
+                  code_line_container.append(pre).append(comments);
+                  comments = null; // must reset comments or else it doesnt work...
+                  $container_div.append(code_line_container);";
+      ++$curr_line;
     }
-    return $diffs_as_p;
+    return $output;
   }
  
   // Given a diff file, format it nicely using html, then return the string
@@ -246,12 +273,11 @@
     
     } else {    
       // loop through lines in the current diff
-      $diffs_as_p = diff_lines_to_paragraphs($diff_lines, $start_line_idx);
-      $diff_str .= "var diffs_as_p = $(\"$diffs_as_p\");
-                    for (var i=0; i<diffs_as_p.length; ++i) {
-                      $(diffs_as_p[i]).data('line_number', $start_line_idx + i);
-                    }
-                    code_div.append(diffs_as_p);";
+      $diff_str .= append_diff_lines_to_div($diff_lines, "code_div", $start_line_idx);
+      /*$diff_str .= "var code_lines = code_div.find('.code-line');
+                    for (var i=0; i<code_lines.length; ++i) {
+                      $(code_lines[i]).data('line_number', $start_line_idx + i);
+                    }";*/
     }
     
     $diff_str .= "file_div.append(code_div);
@@ -287,7 +313,9 @@
     $diff_lines = explode("\n", $diff_contents);
     array_pop($diff_lines); // last entry is empty from explode()ing on a trailing \n
     
-    echo diff_lines_to_paragraphs($diff_lines, $diff_start_line);
+    $output = "var code_div = $('<div class=\"file_code_div\"></div>');";
+    $output .= append_diff_lines_to_div($diff_lines, "code_div", $diff_start_line);
+    echo "<script>function get_new_code_div() { $output return code_div;}</script>";
     
   } else {
     $diffs_by_file = get_diffs_arr_by_file($diff_file_path);

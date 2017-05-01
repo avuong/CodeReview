@@ -26,6 +26,8 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 20px;
 }
 
+/* CSS for each file container */
+
 .file_div {
   border-radius: 2px;
   border-width: 1px;
@@ -33,6 +35,8 @@ h1, h2, h3, h4, h5, h6 {
   border-style: solid;
   margin: 30px 0px;
 }
+
+/* Header of file containers */
 
 .file_header_div {
   background-color: #ECEFF1;
@@ -89,25 +93,40 @@ i.toggle-btn {
   color: #546e7a;
 }
 
+/* Container for the code of the diff */
+
 .file_code_div {
   padding: 5px;
 }
 
-.file_code_div > p {
+.file_code_div p.code-line {
   cursor: default;
+  margin: 0;
 }
 
-.file_code_div > p:hover {
+.file_code_div p.code-line:hover {
   border: 1px solid #888888;
 }
 
+.file_code_div p.added-code {
+  background-color: #dbffdb;
+}
+
+.file_code_div p.deleted-code {
+  background-color: #f1c0c0;
+}
+
+/* Create new comment div */
+
 .create_comment_container {
   display: none;
-  padding: 5px 0;
-  margin: 5px 0;
+  background-color: #ECEFF1;
+  padding: 10px;
+  margin: 5px;
   border-style: solid;
-  border-width: 1px 0px 1px 0px;
-  border-color: #ECEFF1;
+  border-width: 1px 1px 1px 1px;
+  border-color: #b0bec5;
+  border-radius: 2px;
 }
 
 .create_comment_form input {
@@ -123,4 +142,45 @@ i.toggle-btn {
   border-top: 1px solid #ECEFF1;
   border-right: 1px solid #ECEFF1;
   border-left: 1px solid #ECEFF1;
+  background-color: white;
+  margin-bottom: 10px;
+}
+
+/* Read old comment */
+.code-line-comment-container {
+  border: 1px solid #546e7a;
+  border-radius: 2px;
+  margin: 5px;
+}
+.code-line-container pre {
+  margin: 0;
+}
+.code-line-comment {
+  padding: 5px;
+}
+.comment-light {
+  background-color: white; /*#eceff1*/
+}
+.comment-dark {
+  background-color: #eceff1; /*#cfd8dc*/
+}
+.comment-header {}
+.comment-author {
+  display: inline;
+}
+.comment-timestamp {
+  display: inline;
+  float: right;
+  color: #78909c;
+}
+.comment-message {
+  margin: 3px 0 3px 10px;
+}
+.comment-action-container {}
+.comment-action {
+  display: inline;
+  color: #00695c;
+  cursor: pointer;
+  margin-right: 7px;
+  text-decoration: underline;
 }

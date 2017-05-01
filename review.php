@@ -110,7 +110,7 @@
    * Helper functions for comments
    */
    // use ajax to submit the comment
-   function submit_comment(text, line, comment_div) {
+   function submit_comment(text, line, new_comment_div) {
      
      var request = $.ajax({
         url: "submit_comment.php",
@@ -123,10 +123,56 @@
         }
       });
       
+      // after submitting a comment, we will remove the create comment box
+      // and then refresh the comments for the line commented on
       request.success(function(data) {
-        comment_div.hide(500, function() {
+        new_comment_div.hide(500, function() {
           $(this).remove();
         });
+        var $code_line_container = new_comment_div.closest('.code-line-container');
+        var $code_line_comments = $code_line_container.find('.code-line-comment-container');
+        if ($code_line_comments.length == 0) {
+          $old_comments = $('<div class=\"code-line-comment-container\"></div>');
+          $code_line_container.append($old_comments);
+        } else {
+          var $old_comments = $code_line_comments;
+        }
+        $old_comments.html(data);
+        $old_comments.replaceWith(get_refreshed_comments());
+        add_code_line_listeners();
+      });
+      
+      request.fail(function(jqXHR, textStatus) {
+        alert( "Request failed: " + textStatus );
+      });
+
+      return false;   
+   }
+   // use ajax to delete a comment
+   function delete_comment(comment_id, line_number, delete_btn) {
+     
+     var request = $.ajax({
+        url: "delete_comment.php",
+        type: "POST",
+        data: {
+          comment_id: comment_id,
+          line_number: line_number,
+          diff_id: <?php echo $diff_id;?>
+        }
+      });
+      
+      // after deleting a comment, we will 
+      // refresh the comments for the line commented on
+      request.success(function(data) {
+        var $code_line_container = delete_btn.closest('.code-line-container');
+        var $old_comments = $code_line_container.find('.code-line-comment-container');
+        $old_comments.html(data);
+        $old_comments.replaceWith(get_refreshed_comments());
+        var new_comments = $code_line_container.find('.code-line-comment-container');
+        if (new_comments.children().length == 0) {
+          new_comments.remove();
+        }
+        add_code_line_listeners();
       });
       
       request.fail(function(jqXHR, textStatus) {
@@ -181,8 +227,13 @@
         }
       });
       
+      // `data` contains jquery that defines a function `get_new_code_div`
+      // This can be called to retrieve the div to replace the old code div
       request.success(function(data) {
-        $(self).parent().html(data);
+        var $old_file_div = $(self).closest('.file_code_div');
+        $old_file_div.html(data);
+        $old_file_div.replaceWith(get_new_code_div());
+        add_code_line_listeners();
       });
       
       request.fail(function(jqXHR, textStatus) {
@@ -226,12 +277,38 @@
     });
   }
   
-  function add_code_line_listener() {
-    $(".file_code_div > p").on("click", function() {
+  function add_code_line_listeners() {
+    $(".file_code_div p.code-line").off("click");
+    $(".file_code_div p.code-line").on("click", function() {
       var self = $(this);
-      var $comment = get_create_comment_div(self.data('line_number'));
-      self.after($comment);
-      $comment.show(500);
+      // if there is already a create comment div, then just toggle it
+      var create_comment_div = self.closest('.code-line-container').children('.create_comment_container');
+      if (create_comment_div.length > 0) {
+        create_comment_div.toggle(500);
+        
+      // else create a new create comment div
+      } else {
+        var $comment = get_create_comment_div(self.closest('.code-line-container').data('line_number'));
+        self.parent('pre').after($comment);
+        $comment.show(500);
+      }
+    });
+    
+    $(".reply-comment").off("click");
+    $(".reply-comment").on("click", function() {
+      console.log($(this).closest('.code-line-comment').data());
+    });
+    $(".edit-comment").off("click");
+    $(".edit-comment").on("click", function() {
+      console.log($(this).closest('.code-line-comment').data());
+    });
+    $(".delete-comment").off("click");
+    $(".delete-comment").on("click", function() {
+      delete_comment(
+        $(this).closest('.code-line-comment').data('comment_id'),
+        $(this).closest('.code-line-container').data('line_number'),
+        $(this)
+      );
     });
   }
    
@@ -253,7 +330,7 @@
         add_load_more_listener();
         init_materialize_objs();
         add_toggle_listener();
-        add_code_line_listener();
+        add_code_line_listeners();
       });
       
       request.fail(function(jqXHR, textStatus) {

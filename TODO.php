@@ -28,8 +28,15 @@ include("navbar.php");
     </li>
     <li class="collection-item">
       -Basic functionality of groups is done -> when they create a group we will write that to the database and add all the correct users into to users_groups_junction table...need to make form look nicer and do some error checking. Ex.) multiple groups with same name can be made...need unique constraint? , etc...
-      -Chip for users
-      -display table of groups to users on different page than form
+      <br>-Chip for users
+      <br>-display table of groups to users on different page than form
+      <br>-display which users are in the group (perhaps clickable link on group name which goes to another page or opens modal with users list)
+    </li>
+    <li class="collection-item">
+      Add code styling to get_file_version.php
+    </li>
+    <li class="collection-item">
+      <b>DEMO:</b> Remove TODO from the navbar
     </li>
   </ul>
 </div>

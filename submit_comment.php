@@ -21,4 +21,9 @@
 	oci_bind_by_name($stmt,':line_number', $line_number);
 	oci_execute($stmt);
   oci_close($conn);
+  
+  // contains `function get_refreshed_comments($diff_id, $line_number)`
+  require("get_refreshed_comments.php");
+  echo get_refreshed_comments($diff_id, $line_number);
+  
 ?>
