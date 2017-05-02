@@ -29,14 +29,16 @@
   //default permissions for now
   $permissions = 0;
 
-  echo "Group Name: ".$group_name;
+  /*echo "Group Name: ".$group_name;
   echo "<br/>";
   echo "Desc: ".$description;
   echo "<br/>";
   echo "Reviewer Users: ".$users_string;
-  echo "<br/>";
+  echo "<br/>";*/
 
-  $user_ids = array();
+  $user_ids = json_decode($_POST['members']);
+  //$user_ids = array();
+  /*
   //get a list of user_id's from user names given
   foreach($user_array as $user){
 
@@ -51,7 +53,7 @@
       array_push($user_ids, $row['ID']);
     }
   }
-
+  */
 
 
   //create group in group table first
@@ -89,5 +91,11 @@
     }
   }
 
+  //alert success and redirect
+   echo ("<SCRIPT>
+        window.alert('Group Successfully created')
+        window.location.href='./view_groups.php';
+        </SCRIPT>");
 
+   //header("Location: ./view_groups.php");
 ?>

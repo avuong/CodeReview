@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <?php 
-  $referrer = "/select_commits.php";
+  #$referrer = "/select_commits.php";
   require("authenticate_visitor.php");
 ?>
 
@@ -34,6 +34,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="styles/autocomplete.css" rel="stylesheet">
     <script src="scripts/jquery.autocomplete.min.js"></script>
+    <link href="styles/create_review.css" rel="stylesheet">
   ';
 	include("head.php"); 
 	?>
@@ -42,9 +43,11 @@
   
 	<?php include("navbar.php"); ?>
 
-    <div class="container">
+    <div class="create-form-container z-depth-2">
     <div class="row">
       <form id="submit_review_form" action="submit_review.php" method="POST" class="col s12">
+        
+        <h4>Form Details</h4>
         
         <div class="row">
           <div class="input-field col s3">
@@ -91,7 +94,7 @@
           </div>
         </div>
         
-        <input name="submit_review" type="submit" value="Submit" class="waves-effect waves-light btn" />
+        <button name="submit_review" type="submit" class="waves-effect waves-light btn" >Submit</button>
         
       </form>
     </div>
@@ -215,19 +218,6 @@
         })
       });
     </script>
-    
-    <style>
-      a.btn-small {
-        line-height: 0px;
-        height: 20px;
-        width: 20px;
-        float: right;
-      }
-      i.tiny {
-        line-height: 20px;
-        font-size: 1rem;
-      }
-    </style>
     
   </body>
 

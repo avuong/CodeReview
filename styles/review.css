@@ -3,6 +3,10 @@ teal lighten-5: #E0F2F1
 blue-grey lighten-5: #ECEFF1
 */
 
+html {
+  background-color: #cfd8dc; /* eceff1 cfd8dc b0bec5 */
+}
+
 h1, h2, h3, h4, h5, h6 {
   color: #455a64;
 }
@@ -15,6 +19,8 @@ h1, h2, h3, h4, h5, h6 {
   #border-radius: 10px 10px 0 0;
   #border: 1px solid #ECEFF1;
   #border-bottom: none;
+  background-color: #cfd8dc;
+  color: white;
 }
 
 .tabs {
@@ -22,10 +28,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #toast-container {
-  left: 50%;
-  bottom: 20px;
-  transform: translate(-50%, -50%);
-  margin: 0 auto; 
+  position: fixed !important;
+  left: 50% !important;
+  bottom: 20px !important;
+  top: auto !important;
+  right: auto !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 auto !important; 
 }
 
 /*
@@ -33,18 +42,37 @@ h1, h2, h3, h4, h5, h6 {
  */
  
  #details_container {
-  border-radius: 2px;
-  border-width: 1px;
-  border-color: #cfd8dc;
-  border-style: solid;
-  background-color: #cfd8dc;
-  padding: 20px 30px;
+   margin-top: 30px; 
+   border-radius: 2px;
+   border-width: 1px;
+   border-color: #cfd8dc;
+   border-style: solid;
+   background-color: white;
+   padding: 40px 50px 0px 50px;
  }
  
-.section {
-  #border: 1px solid #455A64;
-  background-color: white;
-  border-radius: 2px;
+#details_container #reviewers-container {
+  display: none;
+}
+
+#details_container .detail-section {
+  margin-bottom: 40px;
+}
+
+#details_container .detail-section p {
+  margin: 0px;
+}
+
+#details_container .block-header {
+  margin: 0 0 15px 0;
+}
+
+#details_container .inline-header {
+  display: inline;
+  margin-right: 10px;
+}
+#details_container .inline-header + p {
+  display: inline;
 }
 
 /*
@@ -122,6 +150,7 @@ i.toggle-btn {
 
 .file_code_div {
   padding: 5px;
+  background-color: white;
 }
 
 .file_code_div p.code-line {
@@ -145,7 +174,7 @@ i.toggle-btn {
 
 .create_comment_container {
   display: none;
-  background-color: #ECEFF1;
+  background-color: white; /*#ECEFF1;*/
   padding: 10px;
   margin: 5px;
   border-style: solid;
@@ -164,9 +193,9 @@ i.toggle-btn {
 }
 
 .create_comment_form textarea {
-  border-top: 1px solid #ECEFF1;
-  border-right: 1px solid #ECEFF1;
-  border-left: 1px solid #ECEFF1;
+  #border-top: 1px solid #ECEFF1;
+  #border-right: 1px solid #ECEFF1;
+  #border-left: 1px solid #ECEFF1;
   background-color: white;
   margin-bottom: 10px;
 }
@@ -175,7 +204,7 @@ i.toggle-btn {
 /* Reply form */
 .create_reply_container {
   display: none;
-  background-color: #ECEFF1;
+  background-color: white;
   padding: 10px;
   border-style: solid;
   border-width: 1px 1px 1px 1px;
@@ -194,9 +223,6 @@ i.toggle-btn {
 }
 
 .create_reply_form textarea {
-  border-top: 1px solid #ECEFF1;
-  border-right: 1px solid #ECEFF1;
-  border-left: 1px solid #ECEFF1;
   background-color: white;
   margin-bottom: 10px;
 }
@@ -215,9 +241,11 @@ i.toggle-btn {
 }
 .comment-light {
   background-color: white; /*#eceff1*/
+  border: 1px solid #eceff1;
 }
 .comment-dark {
   background-color: #eceff1; /*#cfd8dc*/
+  border: 1px solid white;
 }
 .comment-header {}
 .comment-author {

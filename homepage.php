@@ -19,9 +19,15 @@
     <!-- TOGGLE -->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/css-toggle-switch/latest/toggle-switch.css" />
 
+    <link href="styles/create_review.css" rel="stylesheet">
+    <style>
+      tr{
+        cursor: pointer;
+      }
+    </style>
   </head>
 
-  <body onload="get_incoming_reviews();" style="background-color:#BFEFFF;">
+  <body onload="get_incoming_reviews();">
 
      <?php include("navbar.php"); ?>
 
@@ -58,9 +64,12 @@
         
         return false;    
      }
+
    </script>
    
-
+   <!-- hidden input for refresh-->
+  <input type="hidden" id="refresh" value="no">
+  
   <div class="switch-toggle switch-candy">
     <input id="incoming" name="view" type="radio" checked>
     <label for="incoming" onclick="get_incoming_reviews();">Incoming Reviews</label>
@@ -71,6 +80,36 @@
     <a></a>
   </div>
 
+   <div class="create-form-container z-depth-2">
+   <div id=resultDiv style="position: relative;"></div>
+   </div>
 
-   <div id=resultDiv style="position: relative; left:50px"></div>
+   <script>
+   //when user clicks on table row
+        $('#resultDiv').on('click', 'table tr', function() {
+            //get the Group name on the table row we clicked on to pass to PHP script
+            var $row = $(this).closest("tr"),
+            $tds = $row.find("td:nth-child(1)");
+
+            console.log('hello');
+            $.each($tds, function() {
+                //below this the group name
+                var $group_name = $(this).text();
+                console.log($group_name);
+
+                //need to get group name out of function above and here
+                //encode URI spaces are weird need to encode them
+                var actual_url = './review.php?id=' + encodeURIComponent($group_name.trim());
+                location.href = actual_url;
+   
+            });
+
+        });
+
+        //refresh on back button
+        $(document).ready(function(e) {
+          var $input = $('#refresh');
+          $input.val() == 'yes' ? location.reload(true) : $input.val('yes');
+        });
+   </script>
  </body>

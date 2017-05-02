@@ -1,6 +1,6 @@
 <?php
   // Authenticate
-  $referrer = "/create_review.php";
+  #$referrer = "/create_review.php";
   require("authenticate_visitor.php");
   
   // Collect vars for...
@@ -67,6 +67,7 @@
 	oci_execute($stmt);  
   
   // Insert all reviewers
+  //  - users
   if (!empty($reviewer_users)) {
     $query = "INSERT ALL";
     foreach ($reviewer_users as $k => $v) {
@@ -75,6 +76,24 @@
     $query .= " SELECT * FROM dual";
     $stmt = oci_parse($conn, $query);
     oci_execute($stmt);
+  }
+  //  - groups
+  if (!empty($reviewer_groups)) {
+    foreach ($reviewer_groups as $group_id) {
+      // get all users in the group
+      $query = "SELECT user_id FROM users_groups_junction WHERE group_id = :group_id";
+      $array = oci_parse($conn, $query);
+      oci_bind_by_name($array, ':group_id', $group_id);
+      oci_execute($array);
+      // insert those users into the reviewers table
+      $query = "INSERT ALL";
+      while($row=oci_fetch_array($array)){
+        $query .= " INTO user_reviewer_junction (review_id, user_id, approved) VALUES ('".$review_id."', ".$row['USER_ID'].", 0)";
+      }
+      $query .= " SELECT * FROM dual";
+      $stmt = oci_parse($conn, $query);
+      oci_execute($stmt);
+    }
   }
   
   // Close connection

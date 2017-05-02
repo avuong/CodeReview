@@ -45,8 +45,20 @@
   oci_bind_by_name($stmt, ':review_id', $review_id);
   oci_execute($stmt);
   oci_fetch($stmt);
+  
+  // Retrieve reviewers for this review
+  $query = "SELECT  u.user_name
+            FROM user_reviewer_junction ur, users u
+            WHERE ur.review_id = :review_id AND ur.user_id = u.id";
+  $array = oci_parse($conn, $query);
+  oci_bind_by_name($array, ':review_id', $review_id);
+  oci_execute($array);
   oci_close($conn);
   
+  $reviewers = array();
+  while($row=oci_fetch_array($array)){
+    array_push($reviewers, $row['USER_NAME']);
+  }
 ?>
 
 <html>
@@ -85,9 +97,57 @@
         <div id="details_div">
           <div id="details_container" class="z-depth-2 col s12">
             <div class="row">
+            
+              <div class="col s6">
+                <div class="row detail-section">
+                  <h5 class="block-header">Summary:</h5>
+                  <div class="col s6">
+                    <p><?php echo $summary;?></p>
+                  </div>
+                </div>
+                <div class="row detail-section">
+                  <h5 class="block-header">Description:</h5>
+                  <div class="col s12">
+                    <p><?php echo $description;?></p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col s6">
+                <div class="row detail-section">
+                  <h5 class="inline-header">Last modified:</h5>
+                  <p><?php echo $timestamp;?></p>
+                </div>
+                <div class="row detail-section">
+                  <h5 class="inline-header">Owner:</h5>
+                  <p><a href="#"><?php echo $owner_name;?></a></p>
+                </div>
+                <div id="reviewers-container" class="row detail-section">
+                  <h5>Reviewers:</h5>
+                  <div class="col s12">
+                    <ul id='reviewers_list' class="collection"></ul>
+                  </div>
+                </div>
+              </div>
+            
+            </div>
+          </div>
+        </div>
+        <!--
+        <div id="details_div">
+          <div id="details_container" class="z-depth-2 col s12">
+            <div class="row">
+              <div class="col s6">
               <h5>Summary</h5>
               <div class="col s6 section">
                 <p><?php echo $summary;?></p>
+              </div>
+              </div>
+              <div class="col s6">
+                <h5>Last modified</h5>
+                <div class="col s12 section">
+                  <p><?php echo $timestamp;?></p>
+                </div>
               </div>
             </div>
             <div class="row">
@@ -100,26 +160,38 @@
               <div class="col s6">
                 <h5>Owner</h5>
                 <div class="col s12 section">
-                  <p><?php echo $owner_name;?></p>
+                  <p><a href="#"><?php echo $owner_name;?></a></p>
                 </div>
               </div>
-              <div class="col s6">
-                <h5>Last modified</h5>
-                <div class="col s12 section">
-                  <p><?php echo $timestamp;?></p>
-                </div>
+            <div id="reviewers-container" class="col s6">
+              <h5>Reviewers</h5>
+              <div class="col s12 section">
+                <ul id='reviewers_list' class="collection"></ul>
               </div>
+            </div>
             </div>
           </div>
         </div>
-        
+        -->
         <div id="diff_div" class="col s12"></div>
         
       </div>
     </div>
   
   <script>
-  
+  // Populate the reviewers list
+  function populate_reviewers_list() {
+    var reviewers = <?php echo json_encode($reviewers); ?>;
+    if (reviewers.length > 0) {
+      var $ul = $('#reviewers_list');
+      for (var i=0; i<reviewers.length; ++i) {
+        $ul.append('<li class="collection-item">'+reviewers[i]+'</li>');
+      }
+      $("#reviewers-container").show();
+    }
+  }
+  populate_reviewers_list();
+            
   /*
    * Helper functions for comments
    */
@@ -331,12 +403,14 @@
       var create_comment_div = self.closest('.code-line-container').children('.create_comment_container');
       if (create_comment_div.length > 0) {
         create_comment_div.toggle(500);
+        create_comment_div.find('textarea#new_comment').focus();
         
       // else create a new create comment div
       } else {
         var $comment = get_create_comment_div(self.closest('.code-line-container').data('line_number'));
         self.parent('pre').after($comment);
         $comment.show(500);
+        $comment.find('textarea#new_comment').focus();
       }
     });
     

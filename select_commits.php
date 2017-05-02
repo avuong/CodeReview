@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <?php 
-  $referrer = "/clone.php";
+  #$referrer = "/clone.php";
   require("authenticate_visitor.php");
 ?>
 
@@ -23,6 +23,7 @@
 	?>
   
   <body>
+  <?php include("navbar.php"); ?>
   
   <?php
 	$review_id = $_SESSION['review_id'];
@@ -64,14 +65,20 @@ EOT;
 	$commit_tree = shell_exec($cmd);
 	#echo "<pre>$commit_tree</pre>";
   ?>
+
+  <div id="underMySidenav" class="sidenav"></div>
   
-  <div id="mySidenav" class="sidenav container">
+  <div id="mySidenav" class="sidenav">
+  <!--<div id="mySidenav" class="sidenav valign-wrapper">
+  <div class="valign">-->
   <h5>Select two commits</h5>
   <form name="get_diff" action="" id="get_diff" method="POST">
         <input placeholder="Commit #1" name="diff1" id="commit1" type="text" required readonly/>
         <input placeholder="Commit #2" name="diff2" id="commit2" type="text" required readonly/>
       <input name="diff_submit" id="diff_submit" type="button" value="Get Diff!" class="waves-effect waves-light btn" />
   </form>
+  <!--</div>
+  </div>-->
   </div>
   <canvas id="gitGraph"></canvas>
 

@@ -300,7 +300,7 @@
  
   // Given a diff file, format it nicely using html, then return the string
   function diff_to_html_string($file_diff, $max_diff_size, &$start_line_idx, &$end_line_idx, $diff_counter) {
-    $diff_str = "var file_div = $(\"<div class='file_div z-depth-1'></div>\");
+    $diff_str = "var file_div = $(\"<div class='file_div z-depth-2'></div>\");
                     var code_div = $(\"<div class='file_code_div'></div>\");";
       
     // divide file diff into array of lines

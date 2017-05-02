@@ -5,20 +5,19 @@
 <html>
 
   <head>
-      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>    <?php
       $title = "Clone";
       include("head.php"); 
     ?>
     
+    <link href="styles/create_review.css" rel="stylesheet">
   </head>
 
   <body onload="get_groups();">
 
     <?php include("navbar.php"); ?>
-
-    <p> Create groups <a href=./groups.php> here </a></p>
     
     <script>
      function get_groups(){
@@ -59,13 +58,15 @@
       });
           
      </script>
-     <div id=resultDiv style="position: relative; left:50px"></div>
+     <div class="create-form-container z-depth-2">
+       <div id=resultDiv style="position: relative;"></div>
+     </div>
        <!-- Modal Structure -->
       <div id="modal1" class="modal modal-fixed-footer">
         <div class="modal-content">
           <h4>Group Members</h4>
           <div id="modal-body">
-            <p>A bunch of text</p>
+            <p></p>
           </div>
         </div>
         <div class="modal-footer">

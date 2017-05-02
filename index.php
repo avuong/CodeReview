@@ -7,9 +7,12 @@
     $title = "Login";
     include("head.php"); 
   ?>
-  
-  <body style="background-color:#BFEFFF;">
+  <head>
+    <link href="styles/create_review.css" rel="stylesheet">
+  </head>
+  <body>
     
+  <div class="create-form-container z-depth-2">  
   <div class="valign-wrapper">
     <div class="valign container">
       <h3>Shallow Bugs</h3>
@@ -25,7 +28,7 @@
         <label>Password:</label>
         <input name="password" type="password" size="25" />
 
-        <input name="mySubmit" type="submit" value="Log In!" class="waves-effect waves-light btn" />
+        <button name="mySubmit" type="submit" class="waves-effect waves-light btn">Log In!</button>
       </form>
       
       <iframe name="myIframe" frameborder="0" border="0" cellspacing="0" style="border-style: none;width: 100%; height: 30px;" scrolling="no"></iframe>
@@ -33,6 +36,7 @@
       <p>Don't have an account? </p>
       <a href="./signup.html"> Sign up here </a>
     </div>
+  </div>
   </div>
 
   </body>

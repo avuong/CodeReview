@@ -46,12 +46,21 @@
   oci_bind_by_name($stmt,':name', $name);
   oci_bind_by_name($stmt,':hash', $hash);
   oci_bind_by_name($stmt,':salt', $salt);
-  $r = oci_execute($stmt);
+  $r = @oci_execute($stmt);
   $err = array();
-  //TODO: see if there are better errors messages (i.e. return code for unique user constraint?)
+
+  //query failed
   if (!$r) {
-    echo "<div style = 'color:red'>*Something went wrong with the query</div>";
-    oci_close($conn);
+      $m = oci_error($stmt);
+
+      if($m['code'] == 1) {
+        echo "<div style = 'color:red'>*User Name already exists</div>";
+      }
+      else{ 
+          echo "<div style = 'color:red'>*Something went wrong with the query</div>";
+      }
+      oci_close($conn);
+
   } else{
 	// after adding a new user, grant them a new session_cache_expire
 	$session_key = session_id();

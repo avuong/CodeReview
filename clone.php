@@ -3,6 +3,10 @@
 <?php require("authenticate_visitor.php"); ?>
 
 <html>
+  <head>
+    <link href="styles/clone.css" rel="stylesheet">
+  </head>
+
   <?php
     $title = "Clone";
     include("head.php"); 
@@ -84,18 +88,19 @@
       }
  
     ?>
-  
+
   	<div class="valign-wrapper">
 
     <!-- Repo input form -->
-    <div class="valign container">
+    <div class="valign container z-depth-2 clone-container">
       <h3> Create a Review </h3>
       <form id="create_review_form" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
           <label><b>Git Repository:</b></label>
 		  <input type="text" name="repo" value="<?php echo $repo;?>" autofocus="autofocus">
           <span class="error" style="color: red;"><?php echo $repoErr;?></span>
           <br></br>
-          <input type="submit" name="form_repo_name" value="Create" class="waves-effect waves-light btn"/>
+          <button type="submit" name="form_repo_name" value="Create" class="waves-effect waves-light btn">Create
+          </button>
       </form>
       
       <div id="loader" class="center-align" style="display: none">
@@ -181,6 +186,8 @@
 		width: 100%;
 		height: 100%;
 	}
+  
+  
 	
 /* The Modal (background) */
 .modal {

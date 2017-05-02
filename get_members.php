@@ -20,10 +20,14 @@
   $query = "SELECT a.USER_NAME
             FROM users a, users_groups_junction b
             WHERE b.group_id=$group_id
-            AND b.user_id=a.id";
+            AND b.user_id=a.id
+            ORDER BY USER_NAME"; //alphabetize
 
   $array = oci_parse($conn, $query);
   oci_execute($array);
+  echo "Here are the members in this group: <br> <br>";
+  $counter=1;
   while($row=oci_fetch_array($array)){
-    echo $row['USER_NAME'].'<br>';
+    echo $counter.".) ".$row['USER_NAME'].'<br>';
+    $counter++;
   }

@@ -9,3 +9,13 @@
   </ul>
 </div>
 </nav>
+
+<style>
+  .brand-logo {
+    margin-left: 15px;
+  }
+  
+  nav {
+    z-index: 2; /* Stay on top */
+  }
+</style>
