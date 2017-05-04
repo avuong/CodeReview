@@ -8,13 +8,14 @@
     include("head.php"); 
   ?>
   <head>
-    <link href="styles/create_review.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="styles/index.css" rel="stylesheet">
   </head>
   <body>
     
-  <div class="create-form-container z-depth-2">  
+  
   <div class="valign-wrapper">
-    <div class="valign container">
+    <div class="valign container login-container z-depth-2">
       <h3>Shallow Bugs</h3>
       <blockquote style="display: inline-block; margin: 0 0 20px 2.2em;">
         <h6>Given enough eyeballs, all bugs are shallow</h6>
@@ -37,23 +38,12 @@
       <a href="./signup.html"> Sign up here </a>
     </div>
   </div>
-  </div>
+  
 
   </body>
 
   <style>
-  html {
-    width: 100%;
-    height: 85%;
-  }
-  body {
-    width: 100%;
-    height: 100%;
-  }
-  div.valign-wrapper {
-    width: 100%;
-    height: 100%;
-  }
+  
   /* hanging opening quote */
   blockquote:before {
     display: block;
