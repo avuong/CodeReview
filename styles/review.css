@@ -79,6 +79,58 @@ h1, h2, h3, h4, h5, h6 {
  * DIFF TAB
  */
 
+#comment_scroller {
+  display: none;
+  position: fixed;
+  bottom: 50%;
+  top: auto;
+  right: 0px;
+  left: auto;
+  transform: translate(0, 50%);
+  margin: auto 0;
+  
+  background: white;
+}
+@media only screen and (min-width: 992px) {
+  #comment_scroller {
+    right: 5%;
+  }
+}
+
+#comment_scroller_shadow_box {
+}
+
+.scroll-btn-container {
+  /*arrows are md-30*/
+  height: 40px;
+  width: 40px;
+  border: 1px solid #455a64;
+  
+  border-radius: 2px;
+}
+
+.scroll-btn {
+  cursor: pointer !important;
+  padding: 4px;
+}
+
+@keyframes pulse {
+  /*
+  0% { border: 1px solid #26a69a; }
+  50% { border: 5px solid #26a69a; }
+  100% { border: 10px solid #26a69a; }
+  */
+  to {
+      transform:scale(1.1);
+  }
+}
+@-webkit-keyframes pulse {
+  to {
+    transform:scale(1.1);
+    background-color:red;
+  }
+}
+
 /* CSS for each file container */
 
 .file_div {
@@ -113,6 +165,7 @@ i.icon-valign {
 /* Rules for sizing the icon. */
 i.md-18 { font-size: 18px; }
 i.md-24 { font-size: 24px; }
+i.md-30 { font-size: 30px; }
 i.md-36 { font-size: 36px; }
 
 /* Rules for using icons as black on a light background. */
@@ -130,6 +183,7 @@ i.md-red { color: #f1c0c0; }
 i.md-red200 { color: #ef9a9a; }
 i.md-red300 { color: #e57373; }
 i.md-red300 { color: #ef5350; }
+i.md-bluegrey700 { color: #455a64; }
 
 .material-icons {
   cursor: default;
@@ -235,6 +289,8 @@ i.toggle-btn {
 }
 .code-line-container pre {
   margin: 0;
+  white-space: pre-wrap;
+  #overflow-x:hidden;
 }
 .code-line-comment {
   padding: 5px 0 5px 5px;

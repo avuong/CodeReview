@@ -62,6 +62,7 @@
 ?>
 
 <html>
+
   <?php
     $title = "Review";
     $include = "
@@ -133,52 +134,127 @@
             </div>
           </div>
         </div>
-        <!--
-        <div id="details_div">
-          <div id="details_container" class="z-depth-2 col s12">
-            <div class="row">
-              <div class="col s6">
-              <h5>Summary</h5>
-              <div class="col s6 section">
-                <p><?php echo $summary;?></p>
-              </div>
-              </div>
-              <div class="col s6">
-                <h5>Last modified</h5>
-                <div class="col s12 section">
-                  <p><?php echo $timestamp;?></p>
-                </div>
-              </div>
+        
+        <div id="diff_div" class="col s12"></div>
+        
+        <!--Comment Scroller-->
+        <div id="comment_scroller">
+          <div id="comment_scroller_shadow_box" class="z-depth-2">
+            <div class="scroll-btn-container">
+              <i id="prev_comment" class="waves-effect waves-teal material-icons md-30 md-bluegrey700 scroll-btn">arrow_upward</i>
             </div>
-            <div class="row">
-              <h5>Description</h5>
-              <div class="col s12 section">
-                <p><?php echo $description;?></p>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col s6">
-                <h5>Owner</h5>
-                <div class="col s12 section">
-                  <p><a href="#"><?php echo $owner_name;?></a></p>
-                </div>
-              </div>
-            <div id="reviewers-container" class="col s6">
-              <h5>Reviewers</h5>
-              <div class="col s12 section">
-                <ul id='reviewers_list' class="collection"></ul>
-              </div>
-            </div>
+            <div class="scroll-btn-container">
+              <i id="next_comment" class="waves-effect waves-teal material-icons md-30 md-bluegrey700 scroll-btn">arrow_downward</i>
             </div>
           </div>
         </div>
-        -->
-        <div id="diff_div" class="col s12"></div>
+
         
       </div>
     </div>
   
   <script>
+  // Comment Scrolling
+  $(function() {
+    // show comment scroll arrows when user moves to the Diff page
+    $(".tab").on('click', function() {
+      var href = $(this).children('a').attr('href');
+      if (href=="#diff_div") {
+        $("#comment_scroller").show();
+      } else {
+        $("#comment_scroller").hide();
+      }
+    });
+    // listen to when user clicks comment scroller
+    function animate_comment(comment) {
+      var animation_time = 1.2;
+      var animation_rounds = 2;
+      comment.css({
+        "transform-origin": "50% 50%",
+        "transform": "scale(1)",
+        "animation": "pulse "+ (animation_time/2) +"s infinite linear alternate",
+        "-webkit-animation": "pulse "+ (animation_time/2) +"s infinite linear alternate"
+      });
+      setTimeout(function() {
+        comment.css({
+          "transform-origin": "auto",
+          "transform": "auto",
+          "animation": "auto",
+          "-webkit-animation": "auto"
+        });
+      }, animation_time * 1000 * animation_rounds);
+    }
+    function scroll_to(comment) {
+      /*
+      $('html, body').animate(
+        { scrollTop: comment.offset().top - ($(window).height()/3) }, 
+        1000, 
+        function() { animate_comment(comment); }
+      );
+      */
+      $('html, body').animate({
+        scrollTop: comment.offset().top - ($(window).height()/3)
+      }, 1000); 
+      animate_comment(comment);
+    }
+    function scroll_to_prev_comment(comments) {
+      var scrollTop = $(window).scrollTop();
+      for (var i=comments.length-1; i>=0; --i) {
+        var offsetTop;
+        var isHidden = false;
+        if (! $(comments[i]).is(":visible")) {
+          offsetTop = $(comments[i]).closest('.file_div').offset().top;
+          isHidden = true;
+        } else {
+          offsetTop = $(comments[i]).offset().top;
+        }
+        if (offsetTop < scrollTop) {
+          if (isHidden) {
+            $(comments[i]).closest('.file_code_div').show();
+          }
+          scroll_to($(comments[i]));
+          return;
+        }
+      }
+      Materialize.toast('No prior comments above.', 2000);
+    }
+    function scroll_to_next_comment(comments) {
+      var scrollBottom = $(window).scrollTop() + $(window).height();
+      for (var i=0; i<comments.length; ++i) {
+        var offsetTop;
+        var isHidden = false;
+        if (! $(comments[i]).is(":visible")) {
+          offsetTop = $(comments[i]).closest('.file_div').offset().top;
+          isHidden = true;
+        } else {
+          offsetTop = $(comments[i]).offset().top;
+        }
+        if (offsetTop > scrollBottom) {
+          if (isHidden) {
+            $(comments[i]).closest('.file_code_div').show();
+          }
+          scroll_to($(comments[i]));
+          return;
+        }
+      }
+      Materialize.toast('No further comments below.', 2000);
+    }
+    $(".scroll-btn").on("click", function() {
+      var comments = $(".code-line-comment-container");
+      if (comments.length == 0) {
+        Materialize.toast('No comments on this page.', 3000);
+      
+      } else {
+        var id = $(this).attr('id');
+        if (id=="prev_comment") {
+          scroll_to_prev_comment(comments);
+        } else if (id=="next_comment") {
+          scroll_to_next_comment(comments);
+        }
+      }
+    });
+  });
+  
   // Populate the reviewers list
   function populate_reviewers_list() {
     var reviewers = <?php echo json_encode($reviewers); ?>;

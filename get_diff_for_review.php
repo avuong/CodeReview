@@ -200,8 +200,8 @@
   
   function get_dropdown($pre_file, $post_file, $diff_counter) {
     $nil = "0000000";
-    $li1 = $pre_file == $nil ? "" : '<li><a href="get_file_version.php?review_id='.$_GET['review_id'].'&file_idx='.$pre_file.'">Before</a></li>';
-    $li2 = $post_file == $nil ? "" : '<li><a href="get_file_version.php?review_id='.$_GET['review_id'].'&file_idx='.$post_file.'">After</a></li>';
+    $li1 = $pre_file == $nil ? "" : '<li><a download='.$pre_file.' href="get_file_version.php?review_id='.$_GET['review_id'].'&file_idx='.$pre_file.'">Before</a></li>';
+    $li2 = $post_file == $nil ? "" : '<li><a download='.$post_file.' href="get_file_version.php?review_id='.$_GET['review_id'].'&file_idx='.$post_file.'">After</a></li>';
     
     $output = "var dropdown_div = $('<div class=\"valign-wrapper\" style=\"margin: 0 0 0 auto;\"></div>');
               var dropdown_html = '<a class=\"dropdown-button btn\" href=\"#\" data-activates=\"dropdown-$diff_counter\">View</a><ul id=\"dropdown-$diff_counter\" class=\"dropdown-content\">$li1$li2</ul>';
@@ -316,6 +316,13 @@
     
     // If the diff is too big, just print a button instead of the diff
     if (strlen($file_diff) > $max_diff_size) {
+      global $comment_map;
+      for ($i=$start_line_idx; $i<$end_line_idx; $i++) {
+        if (isset($comment_map[$i])) {
+          $diff_str .= "file_div.addClass(\"has-comments\");";
+          break;
+        }
+      }
       $diff_str .= "var a_container = $('<div class=\"left-align\"></div>');
                     var load_diff_btn = $(\"<a class='waves-effect waves-light btn load_diff'>Load diff</a>\");
                     a_container.append(load_diff_btn);";
