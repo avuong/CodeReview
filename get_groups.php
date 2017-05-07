@@ -29,6 +29,7 @@ require("authenticate_visitor.php");
   if (! $row=oci_fetch_array($array)){
       echo "<br> <br> You currently are not in any groups.";
   } else{
+      echo '<br/><br/>';
       echo '<table class="table table-striped table-bordered table-hover highlight">'; 
       echo "<thead><tr><th>Group Name</th><th>Description</th></tr></thead>";
       echo "<tr id='modal_click' data-target='modal1'><td id='group_name'>"; 

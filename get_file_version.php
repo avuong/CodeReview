@@ -19,6 +19,9 @@
   
   $cmd = "cd $git_repo && git show $file_idx";	
   $shell_output = shell_exec($cmd);
+  
+  echo $shell_output; exit;
+  
   $output = htmlspecialchars($shell_output);
   
   if ($output == "") {

@@ -78,6 +78,21 @@ h1, h2, h3, h4, h5, h6 {
 /*
  * DIFF TAB
  */
+ 
+/* diff dropdown */
+
+#diff-dropdown-container h6 {
+  font-size: 18px;
+  display: inline;
+  margin-right: 10px;
+}
+
+#diff_dropdown_trigger {
+  background-color: white;
+  color: #607d8b;
+}
+ 
+/* comment scroller */
 
 #comment_scroller {
   display: none;
@@ -189,7 +204,7 @@ i.md-bluegrey700 { color: #455a64; }
   cursor: default;
 }
 
-.dropdown-button {
+.dropdown-button.download-button {
   color: #607d8b;
   background-color: #cfd8dc;
 }

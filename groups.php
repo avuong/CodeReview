@@ -76,7 +76,7 @@
       function addUserReviewerListener() {
         $('#add_user_chip > input').devbridgeAutocomplete({
             serviceUrl: "read_users.php",
-            minChars: 2,
+            minChars: 1,
             autoSelectFirst: true,
             onSelect: function (suggestion) {
               user_chip_data = $user_chip.material_chip('data').slice();

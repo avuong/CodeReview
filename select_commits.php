@@ -5,6 +5,36 @@
   require("authenticate_visitor.php");
 ?>
 
+<?php
+	$review_id = $_SESSION['review_id'];
+
+  // If the session review id already exists, then they are updating the diff for
+  // a review they have previously created.
+  $conn = oci_connect("guest", "guest", "xe")
+	or die("<br>Couldn't connect");
+  $query = "SELECT id FROM reviews WHERE id = :review_id";
+  $stmt = oci_parse($conn, $query);
+  oci_define_by_name($stmt, "ID", $return_id);
+  oci_bind_by_name($stmt, ':review_id', $review_id);
+  oci_execute($stmt);
+  oci_fetch($stmt);
+  oci_close($conn);
+  
+  // if there was a return id, then the user is a review owner that is updating their
+  // previously existing review
+  if(empty($return_id)) {
+    $new_review = true;
+    $submit_form_to = "create_review.php";
+  } else {
+    $new_review = false;
+    $submit_form_to = "update_review_diff.php";
+    // pull most recent version of repo
+    $repo = "/tmp/git_clone/$review_id";
+    $cmd = "cd $repo && git pull";
+    $output = shell_exec($cmd);
+  }
+?>
+
 <html>
   <?php
     $title = "Diff Selection";
@@ -26,8 +56,6 @@
   <?php include("navbar.php"); ?>
   
   <?php
-	$review_id = $_SESSION['review_id'];
-
 	// Generate a log of all git commits in a pretty printed JSON format
 	// https://gist.github.com/varemenos/e95c2e098e657c7688fd
 	$gitlog = <<< EOT
@@ -75,7 +103,7 @@ EOT;
   <form name="get_diff" action="" id="get_diff" method="POST">
         <input placeholder="Commit #1" name="diff1" id="commit1" type="text" required readonly/>
         <input placeholder="Commit #2" name="diff2" id="commit2" type="text" required readonly/>
-      <input name="diff_submit" id="diff_submit" type="button" value="Get Diff!" class="waves-effect waves-light btn" />
+      <button name="diff_submit" id="diff_submit" type="button" class="waves-effect waves-light btn"> Get Diff!</button>
   </form>
   <!--</div>
   </div>-->
@@ -326,7 +354,7 @@ EOT;
 
   <script>
     $("#submit_diff_btn").on("click", function() {
-      var url = 'create_review.php';
+      var url = "<?php echo $submit_form_to; ?>";
       var form = $('<form action="' + url + '" method="post">' +
         '<input type="text" name="diff1" value="' + diff1 + '" />' +
         '<input type="text" name="diff2" value="' + diff2 + '" />' +

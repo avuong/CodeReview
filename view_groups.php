@@ -12,7 +12,7 @@
       include("head.php"); 
     ?>
     
-    <link href="styles/create_review.css" rel="stylesheet">
+    <link href="styles/view_groups.css" rel="stylesheet">
   </head>
 
   <body onload="get_groups();">
@@ -58,8 +58,8 @@
       });
           
      </script>
-     <div class="create-form-container z-depth-2">
-       <div id=resultDiv style="position: relative;"></div>
+     <div class="group-members-container z-depth-2">
+       <div id="resultDiv" style="position: relative;"></div>
      </div>
        <!-- Modal Structure -->
       <div id="modal1" class="modal modal-fixed-footer">

@@ -88,7 +88,9 @@
       // insert those users into the reviewers table
       $query = "INSERT ALL";
       while($row=oci_fetch_array($array)){
-        $query .= " INTO user_reviewer_junction (review_id, user_id, approved) VALUES ('".$review_id."', ".$row['USER_ID'].", 0)";
+        if ($owner_id != $row['USER_ID']) {
+          $query .= " INTO user_reviewer_junction (review_id, user_id, approved) VALUES ('".$review_id."', ".$row['USER_ID'].", 0)";
+        }
       }
       $query .= " SELECT * FROM dual";
       $stmt = oci_parse($conn, $query);

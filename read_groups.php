@@ -3,7 +3,7 @@
   $conn = oci_connect("guest", "guest", "xe")
 	or die("<br>Couldn't connect");
   
-  $query = "SELECT id, name FROM groups WHERE REGEXP_LIKE(name, :query)";
+  $query = "SELECT id, name FROM groups WHERE REGEXP_LIKE(name, :query, 'i')";
   $stmt = oci_parse($conn, $query);
   oci_bind_by_name($stmt, ':query', $_GET['query']);
   oci_execute($stmt);

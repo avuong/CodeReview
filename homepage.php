@@ -21,7 +21,7 @@
 
     <link href="styles/create_review.css" rel="stylesheet">
     <style>
-      tr{
+      tbody tr {
         cursor: pointer;
       }
     </style>

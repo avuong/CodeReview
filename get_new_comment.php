@@ -1,5 +1,7 @@
 <?php
   function get_new_comment($comment_id, $author_id, $author, $message, $timestamp, $div_color) {
+    $message = addslashes($message);
+    $message = str_replace("\n","\\n",$message);
     $div_color = $div_color==1 ? "comment-light" : "comment-dark";
     $output = "var new_comment = $('<div class=\"code-line-comment $div_color\"></div>');
                 var header = $('<div class=\"comment-header\"></div>');

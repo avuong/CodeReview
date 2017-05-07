@@ -19,34 +19,37 @@
    */
   $conn = oci_connect("guest", "guest", "xe")
 	or die("<br>Couldn't connect");
-  // Retrieve the filepath to the diff file
-  $query = "WITH ordered_diffs AS (
-              SELECT id, filename 
-              FROM diffs 
-              WHERE review_id = :review_id
-              ORDER BY upload_time DESC)
-            SELECT * 
-            FROM ordered_diffs 
-            WHERE rownum = 1";
-  $stmt = oci_parse($conn, $query);
-  oci_define_by_name($stmt, "ID", $diff_id);
-  oci_define_by_name($stmt, "FILENAME", $diff_file_path);
-  oci_bind_by_name($stmt, ':review_id', $review_id);
-  oci_execute($stmt);
-  oci_fetch($stmt);
-  
-  // Retreive comments for the current diff
-  $query = "alter session set NLS_DATE_FORMAT = 'mon dd, yyyy HH:miam'";
-  $stmt = oci_parse($conn, $query);
-  oci_execute($stmt);
-  $query = "SELECT  c.id, c.author author_id, u.user_name author, c.message, c.timestamp, c.line_number, c.parent_comment
-            FROM comments c, users u 
-            WHERE c.diff_id = :diff_id AND c.author = u.id
-            ORDER BY c.timestamp ASC";
-  $array = oci_parse($conn, $query);
-  oci_bind_by_name($array, ':diff_id', $diff_id);
-  oci_execute($array);
-  oci_close($conn);
+  if ($get_single_file) {
+    $diff_id = $_GET['diff_id'];
+    $query = "SELECT filename FROM diffs WHERE id = :diff_id";
+    $stmt = oci_parse($conn, $query);
+    oci_define_by_name($stmt, "FILENAME", $diff_file_path);
+    oci_bind_by_name($stmt, ':diff_id', $diff_id);
+    oci_execute($stmt);
+    oci_fetch($stmt);  
+    
+    $diff_map = array();
+    $diff_arr = array("filename" => $diff_file_path);
+    $diff_map[$diff_id] = $diff_arr;
+      
+  } else {
+    // Retrieve the filepath to the diff file
+    $query = "WITH ordered_diffs AS (
+                SELECT id, filename 
+                FROM diffs 
+                WHERE review_id = :review_id
+                ORDER BY upload_time DESC)
+              SELECT * 
+              FROM ordered_diffs";
+    $array = oci_parse($conn, $query);
+    oci_bind_by_name($array, ':review_id', $review_id);
+    oci_execute($array);
+    $diff_map = array();
+    while($row=oci_fetch_array($array)){
+      $diff_arr = array("filename" => $row['FILENAME']);
+      $diff_map[$row['ID']] = $diff_arr;
+    }
+  }
   
   // create useful data structure out of the sql output for list of comments
   function add_to_parent($new_comment, $new_comment_parent_id, &$comment_map) {
@@ -97,7 +100,24 @@
     }
     return $comment_map;
   }
-  $comment_map = get_comments_as_map($array);
+        
+  foreach ($diff_map as $diff_id => &$diff) {
+    // Retreive comments for the current diff
+    $query = "alter session set NLS_DATE_FORMAT = 'mon dd, yyyy HH:miam'";
+    $stmt = oci_parse($conn, $query);
+    oci_execute($stmt);
+    $query = "SELECT  c.id, c.author author_id, u.user_name author, c.message, c.timestamp, c.line_number, c.parent_comment
+              FROM comments c, users u 
+              WHERE c.diff_id = :diff_id AND c.author = u.id
+              ORDER BY c.timestamp ASC";
+    $array = oci_parse($conn, $query);
+    oci_bind_by_name($array, ':diff_id', $diff_id);
+    oci_execute($array);
+    
+    $diff['comment_map'] = get_comments_as_map($array);
+  }
+
+  oci_close($conn);
   
   /* 
    * HELPER FUNCTIONS
@@ -204,7 +224,7 @@
     $li2 = $post_file == $nil ? "" : '<li><a download='.$post_file.' href="get_file_version.php?review_id='.$_GET['review_id'].'&file_idx='.$post_file.'">After</a></li>';
     
     $output = "var dropdown_div = $('<div class=\"valign-wrapper\" style=\"margin: 0 0 0 auto;\"></div>');
-              var dropdown_html = '<a class=\"dropdown-button btn\" href=\"#\" data-activates=\"dropdown-$diff_counter\">View</a><ul id=\"dropdown-$diff_counter\" class=\"dropdown-content\">$li1$li2</ul>';
+              var dropdown_html = '<a class=\"dropdown-button btn download-button\" href=\"#\" data-activates=\"dropdown-$diff_counter\">Download</a><ul id=\"dropdown-$diff_counter\" class=\"dropdown-content\">$li1$li2</ul>';
               var dropdown = $(dropdown_html);
               var toggle_btn = '<i class=\"material-icons toggle-btn\">keyboard_arrow_up</i>';
               dropdown_div.append(dropdown).append(toggle_btn);";
@@ -244,8 +264,9 @@
   }  
    
   // create comment divs for the line if there are any
-  function get_comments_for_line($line_number) {
-    global $comment_map;
+  function get_comments_for_line($line_number, $curr_diff_id) {
+    global $diff_map;
+    $comment_map = $diff_map[$curr_diff_id]["comment_map"];
     $output = "var comments = null;";
     // return early if no comments for given line
     if (!isset($comment_map[$line_number])) {
@@ -269,11 +290,12 @@
   }
    
   // loop through array of lines in a diff and build up a string of formatted <p>s
-  function append_diff_lines_to_div($diff_lines, $container_div, $start_line_number) {
+  function append_diff_lines_to_div($diff_lines, $container_div, $start_line_number, $curr_diff_id) {
     $curr_line = $start_line_number;
     $output = "";
     foreach ($diff_lines as $line) {
       $line = addslashes($line);
+      $line = str_replace("\r", '', $line); // remove carriage returns
       $output .= "var code_line_container = $('<div class=\"code-line-container\"></div>');";
       if (!empty($line)){
         if ($line[0] === '+'){
@@ -286,7 +308,7 @@
       } else {
         $output .= "var code_line = $('<p class=\"code-line\">$line</p>');";
       }
-      $comments = get_comments_for_line($curr_line);
+      $comments = get_comments_for_line($curr_line, $curr_diff_id);
       $output .= "$comments
                   var pre = $('<pre></pre>');
                   code_line_container.data(\"line_number\", $curr_line);
@@ -299,7 +321,7 @@
   }
  
   // Given a diff file, format it nicely using html, then return the string
-  function diff_to_html_string($file_diff, $max_diff_size, &$start_line_idx, &$end_line_idx, $diff_counter) {
+  function diff_to_html_string($file_diff, $max_diff_size, &$start_line_idx, &$end_line_idx, $diff_counter, $curr_diff_id) {
     $diff_str = "var file_div = $(\"<div class='file_div z-depth-2'></div>\");
                     var code_div = $(\"<div class='file_code_div'></div>\");";
       
@@ -323,16 +345,17 @@
           break;
         }
       }
+      global $diff_id;
       $diff_str .= "var a_container = $('<div class=\"left-align\"></div>');
                     var load_diff_btn = $(\"<a class='waves-effect waves-light btn load_diff'>Load diff</a>\");
                     a_container.append(load_diff_btn);";
-      $js_obj = "{'start_line': $start_line_idx, 'end_line': $end_line_idx-1}";
+      $js_obj = "{'start_line': $start_line_idx, 'end_line': $end_line_idx-1, 'diff_id': $curr_diff_id}";
       $diff_str .= "load_diff_btn.data($js_obj);
                     code_div.append(a_container);";
     
     } else {    
       // loop through lines in the current diff
-      $diff_str .= append_diff_lines_to_div($diff_lines, "code_div", $start_line_idx);
+      $diff_str .= append_diff_lines_to_div($diff_lines, "code_div", $start_line_idx, $curr_diff_id);
       /*$diff_str .= "var code_lines = code_div.find('.code-line');
                     for (var i=0; i<code_lines.length; ++i) {
                       $(code_lines[i]).data('line_number', $start_line_idx + i);
@@ -346,38 +369,74 @@
   }
   
   // given an array of diffs, return html formatting all of them
-  function diffs_arr_to_html_string($diffs_by_file) {
+  function diffs_arr_to_html_string($diffs_by_file, $curr_diff_id, $is_first) {
     // loop through each diff file and format their lines
-    $php_output = "var outer_div = $('#diff_div');";
+    $php_output = "var outmost_div = $('#diff_div');
+                    var outer_div = $('<div id=\"diff_$curr_diff_id\" class=\"diff-container\"></div>');
+                    outmost_div.append(outer_div);";
+    if (!$is_first) {
+      $php_output .= "outer_div.hide();";
+    }
     $max_diff_size = 1000;  // bytes
     $start_line_idx = 1;
     $end_line_idx = 1;
     $diff_counter = 0;
     
     foreach ($diffs_by_file as $file_diff) {
-      $php_output .= diff_to_html_string($file_diff, $max_diff_size, $start_line_idx, $end_line_idx, $diff_counter);
+      $php_output .= diff_to_html_string($file_diff, $max_diff_size, $start_line_idx, $end_line_idx, $diff_counter, $curr_diff_id);
       ++$diff_counter;
     }
-           
+    
     // return output
     return "<script>$php_output</script>";
+  }
+  
+  function getDiffDropdown($diff_map) {
+    $output = "var outmost_div = $('#diff_div');
+                var dropdown_div = $('<div id=\"diff-dropdown-container\" class=\"right-align\"><h6>Diff Version:</h6></div>');
+                var dropdown_trigger = $('<a id=\"diff_dropdown_trigger\" class=\"dropdown-button diff-dropdown btn\" href=\"#\" data-activates=\"dropdown1\">Latest</a>');
+                var dropdown_structure = $('<ul id=\"dropdown1\" class=\"dropdown-content\"></ul>');";
+    
+    $diff_num = count($diff_map);
+    foreach ($diff_map as $diff_id => $diff) {
+      if ($diff === reset($diff_map))
+        $output .= "var li = $('<li><a href=\"#!\">Latest</a></li>');";
+      else
+        $output .= "var li = $('<li><a href=\"#!\">$diff_num</a></li>');";
+      $output .= "li.on('click', function() {
+                    $('.diff-container').hide();
+                    $('#diff_$diff_id').show();
+                    dropdown_trigger.text($(this).text());
+                  });
+                  dropdown_structure.append(li);";
+      --$diff_num;
+    }
+    $output .= "dropdown_div.append(dropdown_trigger).append(dropdown_structure); outmost_div.append(dropdown_div);";
+    return "<script>$output</script>";
   }
   
   /*
    * FORMAT DIFF AS HTML, THEN ECHO
    */
   if ($get_single_file) {
-    $diff_contents = get_diff_contents($diff_file_path, $diff_start_line, $diff_end_line);
-    // divide file diff into array of lines
-    $diff_lines = explode("\n", $diff_contents);
-    array_pop($diff_lines); // last entry is empty from explode()ing on a trailing \n
-    
-    $output = "var code_div = $('<div class=\"file_code_div\"></div>');";
-    $output .= append_diff_lines_to_div($diff_lines, "code_div", $diff_start_line);
-    echo "<script>function get_new_code_div() { $output return code_div;}</script>";
+    foreach ($diff_map as $diff_id => $diff) {
+      $diff_contents = get_diff_contents($diff['filename'], $diff_start_line, $diff_end_line);
+      // divide file diff into array of lines
+      $diff_lines = explode("\n", $diff_contents);
+      array_pop($diff_lines); // last entry is empty from explode()ing on a trailing \n
+      
+      $output = "var code_div = $('<div class=\"file_code_div\"></div>');";
+      $output .= append_diff_lines_to_div($diff_lines, "code_div", $diff_start_line, $diff_id);
+      echo "<script>function get_new_code_div() { $output return code_div;}</script>";
+    }
     
   } else {
-    $diffs_by_file = get_diffs_arr_by_file($diff_file_path);
-    echo diffs_arr_to_html_string($diffs_by_file);
+    echo getDiffDropdown($diff_map);
+    $is_first = true;
+    foreach ($diff_map as $diff_id => $diff) {
+      $diffs_by_file = get_diffs_arr_by_file($diff['filename']);
+      echo diffs_arr_to_html_string($diffs_by_file, $diff_id, $is_first);
+      $is_first = false;
+    }
   }
 ?>

@@ -47,7 +47,7 @@
   oci_fetch($stmt);
   
   // Retrieve reviewers for this review
-  $query = "SELECT  u.user_name
+  $query = "SELECT  u.user_name, ur.approved
             FROM user_reviewer_junction ur, users u
             WHERE ur.review_id = :review_id AND ur.user_id = u.id";
   $array = oci_parse($conn, $query);
@@ -57,7 +57,12 @@
   
   $reviewers = array();
   while($row=oci_fetch_array($array)){
-    array_push($reviewers, $row['USER_NAME']);
+    //if user approved echo his/her name in green
+    if ($row['APPROVED']){
+        array_push($reviewers, "<div style='color: green;'>".$row['USER_NAME']."</div>");
+    } else {
+        array_push($reviewers, $row['USER_NAME']);
+    }
   }
 ?>
 
@@ -79,6 +84,11 @@
       if (isset($_SESSION['review_created']) && $_SESSION['review_created']==true) {
         echo "<script>Materialize.toast('Review created!', 4000);</script>";
         unset($_SESSION['review_created']);
+        
+      // if a diff was just added to the review, alert the user of that
+      } else if (isset($_SESSION['review_updated']) && $_SESSION['review_updated']==true) {
+        echo "<script>Materialize.toast('Review updated!', 4000);</script>";
+        unset($_SESSION['review_updated']);
       }
     ?>
     
@@ -112,6 +122,24 @@
                     <p><?php echo $description;?></p>
                   </div>
                 </div>
+
+                <div class="row detail-section">
+                    <button id="shipit" style="display: none;" type="button" class="waves-effect waves-light btn">Ship It!</button>
+                </div>
+
+                <div class="row detail-section">
+                    <button id="unship" style="display: none;" type="button" class="waves-effect waves-light btn">Unship It!</button>
+                </div>
+
+                <?php
+                if ($user_id == $owner_id) {
+                  $_SESSION['review_id'] = $review_id;
+                  echo "<div class='row detail-section'>";
+                  echo "<a href='select_commits.php' id='update_diff' type='button' class='waves-effect waves-light btn'>Update Diff</a>";
+                  echo "</div>";
+                }
+                ?>
+
               </div>
               
               <div class="col s6">
@@ -121,10 +149,11 @@
                 </div>
                 <div class="row detail-section">
                   <h5 class="inline-header">Owner:</h5>
-                  <p><a href="#"><?php echo $owner_name;?></a></p>
+                  <p><?php echo $owner_name;?></p>
                 </div>
                 <div id="reviewers-container" class="row detail-section">
                   <h5>Reviewers:</h5>
+                  <p> *Reviewers who have approved are designated in green </p>
                   <div class="col s12">
                     <ul id='reviewers_list' class="collection"></ul>
                   </div>
@@ -199,6 +228,7 @@
     }
     function scroll_to_prev_comment(comments) {
       var scrollTop = $(window).scrollTop();
+      var scrollBottom = $(window).scrollTop() + $(window).height();
       for (var i=comments.length-1; i>=0; --i) {
         var offsetTop;
         var isHidden = false;
@@ -208,7 +238,11 @@
         } else {
           offsetTop = $(comments[i]).offset().top;
         }
-        if (offsetTop < scrollTop) {
+        var prevCommentYThreshold = scrollTop;
+        if ($(comments[i]).hasClass("has-comments")) {
+          prevCommentYThreshold = scrollBottom;
+        }
+        if (offsetTop < prevCommentYThreshold) {
           if (isHidden) {
             $(comments[i]).closest('.file_code_div').show();
           }
@@ -216,20 +250,34 @@
           return;
         }
       }
-      Materialize.toast('No prior comments above.', 2000);
+      //make sure toasts don't keep popping up after one is on the screen
+      if (!$('#toast-container').length){
+        Materialize.toast('No prior comments above.', 2000, '', function(){$('#toast-container').remove()});
+        console.log("hello");
+      }
     }
     function scroll_to_next_comment(comments) {
       var scrollBottom = $(window).scrollTop() + $(window).height();
+      var scrollTop = $(window).scrollTop();
+      // loop through all comments
       for (var i=0; i<comments.length; ++i) {
         var offsetTop;
         var isHidden = false;
+        // if the comment is hidden, then we consider the top of the comment to be
+        // the top of its parent file div
         if (! $(comments[i]).is(":visible")) {
           offsetTop = $(comments[i]).closest('.file_div').offset().top;
           isHidden = true;
         } else {
           offsetTop = $(comments[i]).offset().top;
         }
-        if (offsetTop > scrollBottom) {
+        // if the comment is in a diff that has not been downloaded, then we include
+        // the current screen in the range to search for the next comment
+        var nextCommentYThreshold = scrollBottom;
+        if ($(comments[i]).hasClass("has-comments")) {
+          nextCommentYThreshold = scrollTop;
+        }
+        if (offsetTop > nextCommentYThreshold) {
           if (isHidden) {
             $(comments[i]).closest('.file_code_div').show();
           }
@@ -237,13 +285,17 @@
           return;
         }
       }
-      Materialize.toast('No further comments below.', 2000);
+      console.log("hello2");
+      if (!$('#toast-container').length){
+        Materialize.toast('No further comments below.', 2000, '', function(){$('#toast-container').remove()});
+      }
     }
     $(".scroll-btn").on("click", function() {
-      var comments = $(".code-line-comment-container");
-      if (comments.length == 0) {
-        Materialize.toast('No comments on this page.', 3000);
-      
+      var comments = $(".code-line-comment-container, .has-comments");
+      console.log(comments);
+      if (comments.length == 0 && !$('#toast-container').length) {
+        Materialize.toast('No comments on this page.', 3000, '', function(){$('#toast-container').remove()});
+        
       } else {
         var id = $(this).attr('id');
         if (id=="prev_comment") {
@@ -409,7 +461,8 @@
    * Define callbacks for after ajax returns the diff text
    */
   function add_load_more_listener() {
-    $(".load_diff").on("click", function() {        
+    $(".load_diff").on("click", function() {   
+      $(this).closest('.file_div').removeClass('has-comments');
       var self = this;
       var request = $.ajax({
         url: "./get_diff_for_review.php",
@@ -417,7 +470,8 @@
         data: {
           review_id: "<?php echo $review_id;?>",
           start_line: $(this).data("start_line"),
-          end_line: $(this).data("end_line")
+          end_line: $(this).data("end_line"),
+          diff_id: $(this).data("diff_id")
         }
       });
       
@@ -441,11 +495,21 @@
   function init_materialize_objs() {
     // initialize dropdowns
     $(function() {
-      $('.dropdown-button').dropdown({
+      $('.dropdown-button.download-button').dropdown({
         inDuration: 300,
         outDuration: 225,
         constrainWidth: true, // change width of dropdown to that of the activator
         hover: true, // Activate on hover
+        gutter: 0, // Spacing from edge
+        belowOrigin: false, // Displays dropdown below the button
+        alignment: 'left', // Displays dropdown with edge aligned to the left of button
+        stopPropagation: false // Stops event propagation
+      });
+      $('.dropdown-button.diff-dropdown').dropdown({
+        inDuration: 300,
+        outDuration: 225,
+        constrainWidth: true, // change width of dropdown to that of the activator
+        hover: false, // Activate on hover
         gutter: 0, // Spacing from edge
         belowOrigin: false, // Displays dropdown below the button
         alignment: 'left', // Displays dropdown with edge aligned to the left of button
@@ -544,6 +608,50 @@
     }
     get_diff();
   });
+
+  //ship it button
+
+    $(document).ready(function(){
+      $("#shipit").click(function(){
+        $.ajax({
+          type: 'POST',
+          data: ({name: "<?php echo $review_id;?>"}),
+          url: './shipIt.php',
+          success: function(data) {
+            alert("You have approved this review!");
+            window.location.reload();
+          }
+        });
+      });
+
+     $("#unship").click(function(){
+        $.ajax({
+          type: 'POST',
+          data: ({name: "<?php echo $review_id;?>"}),
+          url: './unshipit.php',
+          success: function(data) {
+            //alert(data);
+            alert("You have unapproved this review.");
+            window.location.reload();
+          }
+        });
+      });
+
+      //check to hide ship it button
+      var review_id = "<?php echo $review_id; ?>";
+      var actual_url = './check_ship.php?review_id=' + encodeURIComponent(review_id.trim());
+      $.get(actual_url, function(data) {
+        // show either button depending on thei ship status
+        if (data == '0'){
+            $('#shipit').show();
+        }
+        if (data == '1'){
+            $('#unship').show();
+        }
+
+       });
+    });
+
   </script>
   
   </body>
