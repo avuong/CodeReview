@@ -218,13 +218,13 @@
     return "";
   }
   
-  function get_dropdown($pre_file, $post_file, $diff_counter) {
+  function get_dropdown($pre_file, $post_file, $diff_counter, $curr_diff_id) {
     $nil = "0000000";
-    $li1 = $pre_file == $nil ? "" : '<li><a download='.$pre_file.' href="get_file_version.php?review_id='.$_GET['review_id'].'&file_idx='.$pre_file.'">Before</a></li>';
-    $li2 = $post_file == $nil ? "" : '<li><a download='.$post_file.' href="get_file_version.php?review_id='.$_GET['review_id'].'&file_idx='.$post_file.'">After</a></li>';
+    $li1 = $pre_file == $nil ? "" : '<li><a download="'.$pre_file.'" href="get_file_version.php?review_id='.$_GET['review_id'].'&file_idx='.$pre_file.'">Before</a></li>';
+    $li2 = $post_file == $nil ? "" : '<li><a download="'.$post_file.'" href="get_file_version.php?review_id='.$_GET['review_id'].'&file_idx='.$post_file.'">After</a></li>';
     
     $output = "var dropdown_div = $('<div class=\"valign-wrapper\" style=\"margin: 0 0 0 auto;\"></div>');
-              var dropdown_html = '<a class=\"dropdown-button btn download-button\" href=\"#\" data-activates=\"dropdown-$diff_counter\">Download</a><ul id=\"dropdown-$diff_counter\" class=\"dropdown-content\">$li1$li2</ul>';
+              var dropdown_html = '<a class=\"dropdown-button btn download-button\" href=\"#\" data-activates=\"dropdown-$curr_diff_id-$diff_counter\">Download</a><ul id=\"dropdown-$curr_diff_id-$diff_counter\" class=\"dropdown-content\">$li1$li2</ul>';
               var dropdown = $(dropdown_html);
               var toggle_btn = '<i class=\"material-icons toggle-btn\">keyboard_arrow_up</i>';
               dropdown_div.append(dropdown).append(toggle_btn);";
@@ -232,10 +232,11 @@
   }
   
   // use the first few lines of the diff to create an html header
-  function create_header_div($diff_lines, &$idx, $diff_counter) {
+  function create_header_div($diff_lines, &$idx, $diff_counter, $curr_diff_id) {
     $file_name = get_file_name($diff_lines[0]);
     $status = get_file_status($diff_lines, $pre_file, $post_file);
-    $init_dropdown = get_dropdown($pre_file, $post_file, $diff_counter);
+    $init_dropdown = get_dropdown($pre_file, $post_file, $diff_counter, $curr_diff_id);
+    
     $header_div = "var header_div = $('<div class=\"file_header_div valign-wrapper\"></div>');
                   var file_name = $('$status<h6>$file_name</h6>');
                   $init_dropdown;
@@ -333,7 +334,7 @@
     $end_line_idx += count($diff_lines);
     
     // handle git diff header
-    $header_div = create_header_div($diff_lines, $idx, $diff_counter);
+    $header_div = create_header_div($diff_lines, $idx, $diff_counter, $curr_diff_id);
     $diff_str .= $header_div."file_div.append(header_div);";
     
     // If the diff is too big, just print a button instead of the diff
@@ -433,7 +434,7 @@
   } else {
     echo getDiffDropdown($diff_map);
     $is_first = true;
-    foreach ($diff_map as $diff_id => $diff) {
+    foreach ($diff_map as $diff_id => $diff) {      
       $diffs_by_file = get_diffs_arr_by_file($diff['filename']);
       echo diffs_arr_to_html_string($diffs_by_file, $diff_id, $is_first);
       $is_first = false;

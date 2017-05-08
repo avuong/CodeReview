@@ -485,7 +485,7 @@
   function init_materialize_objs() {
     // initialize dropdowns
     $(function() {
-      $('.dropdown-button.download-button').dropdown({
+      $('.dropdown-button').dropdown({
         inDuration: 300,
         outDuration: 225,
         constrainWidth: true, // change width of dropdown to that of the activator
@@ -495,16 +495,7 @@
         alignment: 'left', // Displays dropdown with edge aligned to the left of button
         stopPropagation: false // Stops event propagation
       });
-      $('.dropdown-button.diff-dropdown').dropdown({
-        inDuration: 300,
-        outDuration: 225,
-        constrainWidth: true, // change width of dropdown to that of the activator
-        hover: false, // Activate on hover
-        gutter: 0, // Spacing from edge
-        belowOrigin: false, // Displays dropdown below the button
-        alignment: 'left', // Displays dropdown with edge aligned to the left of button
-        stopPropagation: false // Stops event propagation
-      });
+      
       // initialize tooltips
       $('.tooltipped').tooltip({delay: 50});
       // initialize modals
@@ -583,11 +574,12 @@
       });
       
       request.success(function(data) {
-        $("#diff_div").html(data);
-        add_load_more_listener();
-        init_materialize_objs();
-        add_toggle_listener();
-        add_code_line_listeners();
+        $("#diff_div").html(data).promise().done(function() {
+          add_load_more_listener();
+          init_materialize_objs();
+          add_toggle_listener();
+          add_code_line_listeners();
+        });
       });
       
       request.fail(function(jqXHR, textStatus) {
