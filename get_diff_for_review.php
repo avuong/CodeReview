@@ -116,6 +116,7 @@
     
     $diff['comment_map'] = get_comments_as_map($array);
   }
+  unset($diff);
 
   oci_close($conn);
   
@@ -408,6 +409,7 @@
                     $('.diff-container').hide();
                     $('#diff_$diff_id').show();
                     dropdown_trigger.text($(this).text());
+                    curr_diff_id = $diff_id;
                   });
                   dropdown_structure.append(li);";
       --$diff_num;
@@ -434,7 +436,7 @@
   } else {
     echo getDiffDropdown($diff_map);
     $is_first = true;
-    foreach ($diff_map as $diff_id => $diff) {      
+    foreach ($diff_map as $diff_id => $diff) {
       $diffs_by_file = get_diffs_arr_by_file($diff['filename']);
       echo diffs_arr_to_html_string($diffs_by_file, $diff_id, $is_first);
       $is_first = false;

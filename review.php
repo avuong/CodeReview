@@ -180,6 +180,7 @@
     </div>
   
   <script>
+  var curr_diff_id = <?php echo $diff_id;?>;
   // Comment Scrolling
   $(function() {
     // show comment scroll arrows when user moves to the Diff page
@@ -321,7 +322,7 @@
         type: "POST",
         data: {
           author: "<?php echo $user_id;?>",
-          diff_id: <?php echo $diff_id;?>,
+          diff_id: curr_diff_id,
           message: text,
           line_number: line,
           parent_id: parent_id
