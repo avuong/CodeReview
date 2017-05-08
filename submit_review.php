@@ -85,16 +85,28 @@
       $array = oci_parse($conn, $query);
       oci_bind_by_name($array, ':group_id', $group_id);
       oci_execute($array);
+      
       // insert those users into the reviewers table
-      $query = "INSERT ALL";
+//      $query = "INSERT ALL /*+ ignore_row_on_dupkey_index(USER_REVIEWER_JUNCTION, USER_REVIEWER_PK) */";
+//      while($row=oci_fetch_array($array)){
+//        if ($owner_id != $row['USER_ID']) {
+//          $query .= " INTO user_reviewer_junction (review_id, user_id, approved) VALUES ('".$review_id."', ".$row['USER_ID'].", 0)";
+//        }
+//      }
+//      $query .= " SELECT * FROM dual";
+//      $stmt = oci_parse($conn, $query);
+//      oci_execute($stmt);
+      
+      // insert those users into the reviewers table
+      #$query = "INSERT ALL /*+ ignore_row_on_dupkey_index(USER_REVIEWER_JUNCTION, USER_REVIEWER_PK) */";
       while($row=oci_fetch_array($array)){
         if ($owner_id != $row['USER_ID']) {
-          $query .= " INTO user_reviewer_junction (review_id, user_id, approved) VALUES ('".$review_id."', ".$row['USER_ID'].", 0)";
+          $query = "INSERT /*+ ignore_row_on_dupkey_index(USER_REVIEWER_JUNCTION, USER_REVIEWER_PK) */ INTO user_reviewer_junction (review_id, user_id, approved) VALUES ('".$review_id."', ".$row['USER_ID'].", 0)";
+          $stmt = oci_parse($conn, $query);
+          oci_execute($stmt);
         }
       }
-      $query .= " SELECT * FROM dual";
-      $stmt = oci_parse($conn, $query);
-      oci_execute($stmt);
+
     }
   }
   

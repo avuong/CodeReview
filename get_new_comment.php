@@ -16,7 +16,7 @@
     if ($author_id == $user_id) {
       $output .= "var a_edit = $('<h6 class=\"comment-action edit-comment\">Edit</h6>');
                   var a_delete = $('<h6 class=\"comment-action delete-comment\">Delete</h6>');
-                  action_container.append(a_edit).append(a_delete);";
+                  action_container.append(a_delete);";
     }
     $output .= "new_comment.append(header).append(message).append(action_container);
                 new_comment.data(\"comment_id\", $comment_id);";

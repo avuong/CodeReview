@@ -131,6 +131,12 @@
                   id: suggestion.data,
                   tag: suggestion.value
                 };
+                for (var i=0; i<user_chip_data.length; --i) { 
+                  if (user_chip_data[i].id === chip.id) {
+                    $('#add_user_chip > input').val("");
+                    return;
+                  }
+                }
                 user_chip_data.push(chip);
                 $user_chip.material_chip({
                   data: user_chip_data.slice(),
@@ -153,6 +159,12 @@
                   id: suggestion.data,
                   tag: suggestion.value
                 };
+                for (var i=0; i<group_chip_data.length; --i) { 
+                  if (group_chip_data[i].id === chip.id) {
+                    $('#add_group_chip > input').val("");
+                    return;
+                  }
+                }
                 group_chip_data.push(chip);
                 $group_chip.material_chip({
                   data: group_chip_data.slice()
