@@ -225,7 +225,7 @@
     $li2 = $post_file == $nil ? "" : '<li><a download="'.$post_file.'" href="get_file_version.php?review_id='.$_GET['review_id'].'&file_idx='.$post_file.'">After</a></li>';
     
     $output = "var dropdown_div = $('<div class=\"valign-wrapper\" style=\"margin: 0 0 0 auto;\"></div>');
-              var dropdown_html = '<a class=\"dropdown-button btn download-button\" href=\"#\" data-activates=\"dropdown-$curr_diff_id-$diff_counter\">Download</a><ul id=\"dropdown-$curr_diff_id-$diff_counter\" class=\"dropdown-content\">$li1$li2</ul>';
+              var dropdown_html = '<a class=\"dropdown-button btn download-button\" href=\"#\" data-activates=\"dropdown-$curr_diff_id-$diff_counter\"><i class=\"material-icons md-24\">file_download</i></a><ul id=\"dropdown-$curr_diff_id-$diff_counter\" class=\"dropdown-content\">$li1$li2</ul>';
               var dropdown = $(dropdown_html);
               var toggle_btn = '<i class=\"material-icons toggle-btn\">keyboard_arrow_up</i>';
               dropdown_div.append(dropdown).append(toggle_btn);";
@@ -340,9 +340,9 @@
     
     // If the diff is too big, just print a button instead of the diff
     if (strlen($file_diff) > $max_diff_size) {
-      global $comment_map;
+      global $diff_map;
       for ($i=$start_line_idx; $i<$end_line_idx; $i++) {
-        if (isset($comment_map[$i])) {
+        if (isset($diff_map[$curr_diff_id]["comment_map"][$i])) {
           $diff_str .= "file_div.addClass(\"has-comments\");";
           break;
         }
