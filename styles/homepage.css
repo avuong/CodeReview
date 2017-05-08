@@ -1,0 +1,28 @@
+html {
+  background-color: #cfd8dc; /* eceff1 cfd8dc b0bec5 */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #455a64;
+}
+
+.create-form-container {
+  margin: 5% 10% 5% 10%;
+  padding: 10px;
+  background-color: white;
+  border-radius: 2px;
+}
+
+tbody tr {
+  cursor: pointer;
+}
+
+i.material-icons.tooltipped {
+  color: #607d8b;
+  cursor: default;
+}
+
+div#tooltip_container {
+  display: inline;
+  float: right;
+}

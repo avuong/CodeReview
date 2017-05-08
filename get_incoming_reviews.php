@@ -13,8 +13,12 @@
   oci_execute($stmt);
 
   echo "Hello ".$user_name."! ";
-  echo "Here are the reviews others have requested you to look at. <br> <br>";
-  echo "Green reviews are ready to be shipped while yellow reviews are in progress <br>";
+  echo "Here are the reviews others have requested you to look at.";
+  $tooltip_msg = "Green reviews are ready to be shipped<br/>Yellow reviews are in progress";
+  echo "<div id=\"tooltip_container\" class=\"right-align\"><i class=\"material-icons tooltipped\" data-position=\"left\" data-delay=\"50\" data-tooltip=\"$tooltip_msg\">help</i></div>";
+  echo "<script>$('.tooltipped').tooltip({delay: 50, html: true});</script>";
+  echo "<br> <br>";
+#  echo "Green reviews are ready to be shipped while yellow reviews are in progress <br>";
 
   $query = "SELECT a.ID, a.SUMMARY, a.TIMESTAMP, c.USER_NAME as owner from 
            reviews a, user_reviewer_junction b, users c 

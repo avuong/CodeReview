@@ -19,12 +19,8 @@
     <!-- TOGGLE -->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/css-toggle-switch/latest/toggle-switch.css" />
 
-    <link href="styles/create_review.css" rel="stylesheet">
-    <style>
-      tbody tr {
-        cursor: pointer;
-      }
-    </style>
+    <link href="styles/homepage.css" rel="stylesheet">
+
   </head>
 
   <body onload="get_incoming_reviews();">

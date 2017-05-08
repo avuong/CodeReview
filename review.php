@@ -125,9 +125,6 @@
 
                 <div class="row detail-section">
                     <button id="shipit" style="display: none;" type="button" class="waves-effect waves-light btn">Ship It!</button>
-                </div>
-
-                <div class="row detail-section">
                     <button id="unship" style="display: none;" type="button" class="waves-effect waves-light btn">Unship It!</button>
                 </div>
 
@@ -153,7 +150,7 @@
                 </div>
                 <div id="reviewers-container" class="row detail-section">
                   <h5>Reviewers:</h5>
-                  <p> *Reviewers who have approved are designated in green </p>
+                  <div id="reviewers_tooltip_container" class="right-align"><i id="reviewers_tooltip" class="material-icons tooltipped" data-position="top" data-delay="50" data-tooltip="Reviewers who have approved are designated in green">info_outline</i></div>
                   <div class="col s12">
                     <ul id='reviewers_list' class="collection"></ul>
                   </div>
@@ -250,11 +247,7 @@
           return;
         }
       }
-      //make sure toasts don't keep popping up after one is on the screen
-      if (!$('#toast-container').length){
-        Materialize.toast('No prior comments above.', 2000, '', function(){$('#toast-container').remove()});
-        console.log("hello");
-      }
+      Materialize.toast('No prior comments above.', 2000);
     }
     function scroll_to_next_comment(comments) {
       var scrollBottom = $(window).scrollTop() + $(window).height();
@@ -285,17 +278,14 @@
           return;
         }
       }
-      console.log("hello2");
-      if (!$('#toast-container').length){
-        Materialize.toast('No further comments below.', 2000, '', function(){$('#toast-container').remove()});
-      }
+      Materialize.toast('No further comments below.', 2000);
     }
     $(".scroll-btn").on("click", function() {
       var comments = $(".code-line-comment-container, .has-comments");
       console.log(comments);
-      if (comments.length == 0 && !$('#toast-container').length) {
-        Materialize.toast('No comments on this page.', 3000, '', function(){$('#toast-container').remove()});
-        
+      if (comments.length == 0) {
+        Materialize.toast('No comments on this page.', 3000);
+      
       } else {
         var id = $(this).attr('id');
         if (id=="prev_comment") {

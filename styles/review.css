@@ -75,6 +75,17 @@ h1, h2, h3, h4, h5, h6 {
   display: inline;
 }
 
+#reviewers-container > h5 {
+  display: inline;
+}
+#reviewers_tooltip_container {
+  display: inline;
+  float: right;
+}
+#reviewers_tooltip {
+  color: #607d8b;
+}
+
 /*
  * DIFF TAB
  */

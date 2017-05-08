@@ -30,7 +30,7 @@
     $submit_form_to = "update_review_diff.php";
     // pull most recent version of repo
     $repo = "/tmp/git_clone/$review_id";
-    $cmd = "cd $repo && git pull";
+    $cmd = "cd $repo && git reset --hard HEAD && git pull";
     $output = shell_exec($cmd);
   }
 ?>
@@ -103,6 +103,7 @@ EOT;
   <form name="get_diff" action="" id="get_diff" method="POST">
         <input placeholder="Commit #1" name="diff1" id="commit1" type="text" required readonly/>
         <input placeholder="Commit #2" name="diff2" id="commit2" type="text" required readonly/>
+      <!--<input name="diff_submit" id="diff_submit" type="button" value="Get Diff!" class="waves-effect waves-light btn" />-->
       <button name="diff_submit" id="diff_submit" type="button" class="waves-effect waves-light btn"> Get Diff!</button>
   </form>
   <!--</div>
